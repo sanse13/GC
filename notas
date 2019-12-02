@@ -1,4 +1,4 @@
-----------------PARTE ILUMINACION------------------
+					          ----------------PARTE ILUMINACION------------------
 
 glEnable(GL_DEPTH_TEST);
 
@@ -6,4 +6,15 @@ para cada pixel necesito su profundidad.
 
 buffer de profundidad, profunidad a la que se encuentra cada pixel que voy a dibujar.
 
+en el main.c, usamos buffer de profundidad y doblebuffer. una vez acabado usamos swap. despues de la funcion
+de glPolygonMode escribimos la funcion glEnable(GL_DEPTH_TEST).
 
+en el display.c la primera linea es glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT)
+
+establecer los parametros de todas las luces y luego dibujamos todos los objetos (las luces también son objetos, es decir, se pueden 
+modificar).
+
+no tiene sentido rotar una bombilla, pero si trasladarlo. la cámara puede ser un objeto de iluminacion, como si fuera un foco.
+
+para la luz necesitamos vectores normales, y no solo vectores normales de poligonos. usar vector normal de cada vertice. el vector normal
+lo obtenemos con los vertices del poligono.
