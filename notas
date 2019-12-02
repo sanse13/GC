@@ -17,4 +17,6 @@ modificar).
 no tiene sentido rotar una bombilla, pero si trasladarlo. la cámara puede ser un objeto de iluminacion, como si fuera un foco.
 
 para la luz necesitamos vectores normales, y no solo vectores normales de poligonos. usar vector normal de cada vertice. el vector normal
-lo obtenemos con los vertices del poligono.
+lo obtenemos con los vertices del poligono. CALCULAR EL VECTOR NORMAL DE CADA VERTICE (para la luz). con el vector normal del poligono, sumo a cada vertice el vector normal del poligono, con esto ya tengo el vector normal de cada vertice.
+
+¿¿¿vector normal de cada poligono??? antes de dibujar el poligono, establezco el vector normal y luego dibujarlo.
