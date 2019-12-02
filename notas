@@ -1,0 +1,9 @@
+----------------PARTE ILUMINACION------------------
+
+glEnable(GL_DEPTH_TEST);
+
+para cada pixel necesito su profundidad.
+
+buffer de profundidad, profunidad a la que se encuentra cada pixel que voy a dibujar.
+
+
