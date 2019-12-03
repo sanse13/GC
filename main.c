@@ -56,11 +56,11 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(KG_WINDOW_X, KG_WINDOW_Y);
     glutCreateWindow(KG_WINDOW_TITLE);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); //poligonos opacos
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    glEnable(GL_DEPTH_TEST); //activar test de profundidad
+     glEnable(GL_DEPTH_TEST); //activar test de profundidad
 
-    glShadeModel(GL_FLAT);
+     glShadeModel(GL_FLAT);
 
     /* set the callback functions */
     glutDisplayFunc(display);

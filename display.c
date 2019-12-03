@@ -15,6 +15,10 @@ extern object3d *_first_object;
 extern object3d *_selected_object;
 extern lista_camera *_selected_camera;  
 
+int index1, index2, index3;
+vector3 normal;
+
+
 vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *vertex_table){
     vector3 normal_vector;
 
@@ -82,7 +86,7 @@ void display(void) {
     object3d *aux_obj = _first_object;
 
     /* Clear the screen */
-    glClear(GL_COLOR_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT| GL_COLOR_BUFFER_BIT);
 
     /* Define the projection */
     glMatrixMode(GL_PROJECTION);
@@ -104,6 +108,8 @@ void display(void) {
         _selected_camera->actual_camera->proj->far);    
     }
 
+  
+
     /*First, we draw the axes*/
     draw_axes();
 
@@ -113,8 +119,7 @@ void display(void) {
     glLoadMatrixf(_selected_camera->actual_camera->m);
 
     
-    int index1, index2, index3;
-    vector3 normal;
+
     /*Now each of the objects in the list*/
     while (aux_obj != 0) {
 
@@ -148,8 +153,6 @@ void display(void) {
                 glNormal3d(aux_obj->face_table[f].normal_vector.x,
                 aux_obj->face_table[f].normal_vector.y,
                 aux_obj->face_table[f].normal_vector.z);
-
-                
 
             }
             glEnd();
