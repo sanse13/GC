@@ -15,6 +15,26 @@ extern object3d *_first_object;
 extern object3d *_selected_object;
 extern lista_camera *_selected_camera;  
 
+vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *vertex_table){
+    vector3 normal_vector;
+
+    vector3 u;
+    u.x = vertex_table[index2].coord.x - vertex_table[index1].coord.x;
+    u.y = vertex_table[index2].coord.y - vertex_table[index1].coord.y;
+    u.z = vertex_table[index2].coord.z - vertex_table[index1].coord.z;
+
+    vector3 v;
+    v.x = vertex_table[index3].coord.x - vertex_table[index1].coord.x;
+    v.y = vertex_table[index3].coord.y - vertex_table[index1].coord.y;
+    v.z = vertex_table[index3].coord.z - vertex_table[index1].coord.z;
+
+    normal_vector.x = (u.y * v.z) - (u.z - v.y);
+    normal_vector.y = (u.z * v.x) - (u.x - v.z);
+    normal_vector.z = (u.x * v.y) - (u.y * v.x);
+
+    return normal_vector;
+}
+
 /**
  * @brief Function to draw the axes
  */
@@ -62,7 +82,7 @@ void display(void) {
     object3d *aux_obj = _first_object;
 
     /* Clear the screen */
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     /* Define the projection */
     glMatrixMode(GL_PROJECTION);
@@ -84,23 +104,6 @@ void display(void) {
         _selected_camera->actual_camera->proj->far);    
     }
 
-    /*When the window is wider than our original projection plane we extend the plane in the X axis*/
-    if ((_ortho_x_max - _ortho_x_min) / (_ortho_y_max - _ortho_y_min) < _window_ratio) {
-        /* New width */
-        GLdouble wd = (_ortho_y_max - _ortho_y_min) * _window_ratio;
-        /* Midpoint in the X axis */
-        GLdouble midpt = (_ortho_x_min + _ortho_x_max) / 2;
-        /*Definition of the projection*/
-        glOrtho(midpt - (wd / 2), midpt + (wd / 2), _ortho_y_min, _ortho_y_max, _ortho_z_min, _ortho_z_max);
-    } else {/* In the opposite situation we extend the Y axis */
-        /* New height */
-        GLdouble he = (_ortho_x_max - _ortho_x_min) / _window_ratio;
-        /* Midpoint in the Y axis */
-        GLdouble midpt = (_ortho_y_min + _ortho_y_max) / 2;
-        /*Definition of the projection*/
-        glOrtho(_ortho_x_min, _ortho_x_max, midpt - (he / 2), midpt + (he / 2), _ortho_z_min, _ortho_z_max);
-    }
-
     /*First, we draw the axes*/
     draw_axes();
 
@@ -110,7 +113,8 @@ void display(void) {
     glLoadMatrixf(_selected_camera->actual_camera->m);
 
     
-
+    int index1, index2, index3;
+    vector3 normal;
     /*Now each of the objects in the list*/
     while (aux_obj != 0) {
 
@@ -127,10 +131,25 @@ void display(void) {
         for (f = 0; f < aux_obj->num_faces; f++) {
             glBegin(GL_POLYGON);
             for (v = 0; v < aux_obj->face_table[f].num_vertices; v++) {
+
+                index1 = aux_obj->face_table->vertex_table[0];
+                index2 = aux_obj->face_table->vertex_table[1];
+                index3 = aux_obj->face_table->vertex_table[2];
+
+                normal = calculate_surface_normal(index1, index2, index3, aux_obj->vertex_table);
+
+                aux_obj->face_table[f].normal_vector = normal;
+
                 v_index = aux_obj->face_table[f].vertex_table[v];
                 glVertex3d(aux_obj->vertex_table[v_index].coord.x,
                         aux_obj->vertex_table[v_index].coord.y,
                         aux_obj->vertex_table[v_index].coord.z);
+
+                glNormal3d(aux_obj->face_table[f].normal_vector.x,
+                aux_obj->face_table[f].normal_vector.y,
+                aux_obj->face_table[f].normal_vector.z);
+
+                
 
             }
             glEnd();
@@ -140,4 +159,5 @@ void display(void) {
     }
     /*Do the actual drawing*/
     glFlush();
+    glutSwapBuffers();
 }
