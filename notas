@@ -28,3 +28,12 @@ reflexión especular. modelo de phong. calculo general de los efectos luminosos 
 coeficiente especular varia el color del reflejo, ns nos dice si es buen o mal reflectante.
 
 luz: posicion, intensidad, lo que aporta la intensidad ambiental y la intensidad de luz que emite.
+
+
+
+					---------------------------PARTE REALIZADA--------------------------------
+
+
+-añadidos los cambios propuestos (menos linea necesariamente comentada) que aparecen en egela (parte display.c y main.c)
+-definitions.h añadido normal_vector
+-calculados los vectores normales
