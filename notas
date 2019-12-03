@@ -37,3 +37,5 @@ luz: posicion, intensidad, lo que aporta la intensidad ambiental y la intensidad
 -añadidos los cambios propuestos (menos linea necesariamente comentada) que aparecen en egela (parte display.c y main.c)
 -definitions.h añadido normal_vector
 -calculados los vectores normales
+
+¿cambiar ficheros .obj?
