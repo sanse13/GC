@@ -79,7 +79,7 @@ void default_cameras(){
     set_camera_projection();
     lista_camera *lista_aux = (lista_camera*)malloc(sizeof(lista_camera));
 
-    vector3 cam_pos; cam_pos.x = 4.0f; cam_pos.y = 3.0f; cam_pos.z = 3.0f;
+    vector3 cam_pos; cam_pos.x = 8.0f; cam_pos.y = 5.0f; cam_pos.z = -1.0f;
     vector3 cam_front; cam_front.x = 0.0f; cam_front.y = 0.0f; cam_front.z = 0.0f;
     vector3 cam_up; cam_up.x = 0.0f; cam_up.y = 1.0f; cam_up.z = 0.0f;
 
