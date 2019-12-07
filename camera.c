@@ -123,7 +123,7 @@ void add_camera_input(){
 }
 
 
-void set_inv_m(lista_camera *c)
+void matriz_inversa(lista_camera *c)
 {
     c->actual_camera->m[0] = c->actual_camera->m_invert[0];
     c->actual_camera->m[4] = c->actual_camera->m_invert[1];
@@ -177,7 +177,7 @@ void add_camera_mode_obj(object3d *obj)
     _selected_camera->actual_camera->m_invert[14] = obj->list_matrix->m[14];
     _selected_camera->actual_camera->m_invert[15] = 1;
 
-    set_inv_m(_selected_camera);
+    matriz_inversa(_selected_camera);
 }
 
 

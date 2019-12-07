@@ -119,14 +119,14 @@ void set_transformation_matrix(){
         } else {
             if (coordenada_activa == COORD_LOCAL){
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
-                set_inv_m(_selected_camera);
+                matriz_inversa(_selected_camera);
             } else {
                 glTranslatef(_selected_object->list_matrix->m[12],
                 _selected_object->list_matrix->m[13],
                 _selected_object->list_matrix->m[14]);
                 glMultMatrixf(_selected_camera->actual_camera->m_invert);
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
-                set_inv_m(_selected_camera);
+                matriz_inversa(_selected_camera);
             }
         }
 }

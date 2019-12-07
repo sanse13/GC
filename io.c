@@ -202,7 +202,7 @@ void modo_analisis(int x, int y){
     glMultMatrixf(m_rot);
     glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
 
-    set_inv_m(_selected_camera);
+    matriz_inversa(_selected_camera);
 }
 
 

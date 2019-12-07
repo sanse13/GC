@@ -6,3 +6,5 @@ cambiado:
     -transformaciones.
     -io.c (lo que le corresponde)
 
+    set_inv_m -> matriz_inversa
+

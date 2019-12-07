@@ -8,4 +8,4 @@ void add_camera_obj(object3d *object);
 void add_camera_list(lista_camera *l_camera);
 void centre_camera_to_obj(object3d *obj);
 void add_camera_mode_obj(object3d *obj);
-void set_inv_m(lista_camera *c);
+void matriz_inversa(lista_camera *c);
