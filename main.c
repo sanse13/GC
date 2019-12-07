@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     /* this initialization has to be AFTER the creation of the window */
     initialization();
 
-    init_transf_values();
+    set_transformation_values();
 
     default_cameras();
 

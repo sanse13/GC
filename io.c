@@ -36,16 +36,15 @@ extern GLdouble _ortho_x_min,_ortho_x_max;
 extern GLdouble _ortho_y_min,_ortho_y_max;
 extern GLdouble _ortho_z_min,_ortho_z_max;
 
-extern transf_values *obj_up_transf_values;
-extern transf_values *obj_down_transf_values;
-extern transf_values *obj_right_transf_values;
-extern transf_values *obj_left_transf_values;
-extern transf_values *obj_avpag_transf_values;
-extern transf_values *obj_repag_transf_values;
-extern transf_values *obj_plus_transf_values;
-extern transf_values *obj_minus_transf_values;
+extern transformaciones *up_values;
+extern transformaciones *down_values;
+extern transformaciones *right_values;
+extern transformaciones *left_values;
+extern transformaciones *avpag_values;
+extern transformaciones *repag_values;
+extern transformaciones *plus_values;
+extern transformaciones *minus_values;
 
-bool traslacion, rotacion, escalado, mundoSR, objetoSR, modoObjeto;
 int camera_object_mode = 0;
 int modo_activo = MODO_OBJ;
 int transformacion_activa = TRASLACION;
@@ -231,10 +230,6 @@ void keyboard(unsigned char key, int x, int y) {
     char* fname = malloc(sizeof (char)*128); /* Note that scanf adds a null character at the end of the vector*/
     int read = 0;
     
-    traslacion = false;
-    rotacion = false;
-    escalado = false;
-    modoObjeto = true;
     object3d *auxiliar_object = 0;
     GLdouble wd,he,midx,midy;
 
@@ -459,7 +454,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 void SpecialInput(int key, int x, int y){
 
-transf_values *t_cam;
+transformaciones *t_cam;
 glMatrixMode(GL_MODELVIEW);
 switch(key){
 
@@ -469,13 +464,13 @@ case GLUT_KEY_UP:
         switch(transformacion_activa){
             case TRASLACION:
                 if (coordenada_activa == COORD_LOCAL)
-                    transform(obj_up_transf_values);
+                    aplicar_transformaciones(up_values);
                 break;
             case ROTACION:
                 if (coordenada_activa == COORD_GLOBAL){
                     modo_analisis(-1, 0);
                 } else {
-                    transform(obj_up_transf_values);
+                    aplicar_transformaciones(up_values);
                 }
                 break;
             case ESCALADO:
@@ -486,7 +481,7 @@ case GLUT_KEY_UP:
                 break; 
         }
     } else {
-        transform(obj_up_transf_values);
+        aplicar_transformaciones(up_values);
     }
 break;
 
@@ -495,13 +490,13 @@ case GLUT_KEY_DOWN:
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada_activa == COORD_LOCAL)
-                transform(obj_down_transf_values);
+                aplicar_transformaciones(down_values);
             break;
         case ROTACION:
             if (coordenada_activa == COORD_GLOBAL)
                 modo_analisis(1, 0);
             else
-                transform(obj_down_transf_values);
+                aplicar_transformaciones(down_values);
             break;
         case ESCALADO:
             _selected_camera->actual_camera->proj->top += 0.01;
@@ -509,7 +504,7 @@ case GLUT_KEY_DOWN:
             break;
         }
     } else {
-        transform(obj_down_transf_values);
+        aplicar_transformaciones(down_values);
     }
     
 break;
@@ -520,14 +515,14 @@ case GLUT_KEY_LEFT:
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada_activa == COORD_LOCAL)
-                transform(obj_left_transf_values);
+                aplicar_transformaciones(left_values);
             break;
 
         case ROTACION:
             if (coordenada_activa == COORD_GLOBAL)
                 modo_analisis(0, -1);
             else
-                transform(obj_left_transf_values);
+                aplicar_transformaciones(left_values);
             break;
 
         case ESCALADO:
@@ -536,7 +531,7 @@ case GLUT_KEY_LEFT:
             break;
         }
     } else {
-        transform(obj_left_transf_values);
+        aplicar_transformaciones(left_values);
     }
 
 break;
@@ -548,14 +543,14 @@ case GLUT_KEY_RIGHT:
 
         case TRASLACION:
             if (coordenada_activa == COORD_LOCAL)
-                transform(obj_right_transf_values);
+                aplicar_transformaciones(right_values);
             break;
         
         case ROTACION:
             if (coordenada_activa == COORD_GLOBAL)
                 modo_analisis(0, 1);
             else
-                transform(obj_right_transf_values);
+                aplicar_transformaciones(right_values);
             break;
 
         case ESCALADO:
@@ -564,7 +559,7 @@ case GLUT_KEY_RIGHT:
             break;
         }
     } else {
-        transform(obj_right_transf_values);
+        aplicar_transformaciones(right_values);
     }
 
 break;
@@ -575,23 +570,23 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada_activa == COORD_GLOBAL){
-                if (distance_camera_to_obj() > 2.5){
-                    t_cam = (transf_values*)malloc(sizeof(transf_values));
-                    t_cam->translate_v = (vector3){
+                if (distancia_camara_objeto() > 2.5){
+                    t_cam = (transformaciones*)malloc(sizeof(transformaciones));
+                    t_cam->translate = (vector3){
                         .x = -_selected_camera->actual_camera->m_invert[8],
                         .y = -_selected_camera->actual_camera->m_invert[9],
                         .z = -_selected_camera->actual_camera->m_invert[10]
                     };
-                    transform(t_cam);
+                    aplicar_transformaciones(t_cam);
                 }
             } else {
-                transform(obj_repag_transf_values);
+                aplicar_transformaciones(repag_values);
             }
             break;
         
         case ROTACION:
             if (coordenada_activa == COORD_LOCAL)
-                transform(obj_repag_transf_values);
+                aplicar_transformaciones(repag_values);
             break;
 
         case ESCALADO:
@@ -600,7 +595,7 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
             break;
         }
     } else {
-        transform(obj_repag_transf_values);
+        aplicar_transformaciones(repag_values);
     }
     
 break;
@@ -611,23 +606,23 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada_activa == COORD_GLOBAL){
-                if (distance_camera_to_obj() < 100){
-                    t_cam = (transf_values*)malloc(sizeof(transf_values));
-                    t_cam->translate_v = (vector3){
+                if (distancia_camara_objeto() < 100){
+                    t_cam = (transformaciones*)malloc(sizeof(transformaciones));
+                    t_cam->translate = (vector3){
                         .x = _selected_camera->actual_camera->m_invert[8],
                         .y = _selected_camera->actual_camera->m_invert[9],
                         .z = _selected_camera->actual_camera->m_invert[10]
                     };
-                    transform(t_cam);
+                    aplicar_transformaciones(t_cam);
                 }
             } else {
-                transform(obj_avpag_transf_values);
+                aplicar_transformaciones(avpag_values);
             }
             break;
         
         case ROTACION:
             if (coordenada_activa == COORD_LOCAL){
-                transform(obj_avpag_transf_values);
+                aplicar_transformaciones(avpag_values);
             }
             break;
 
@@ -637,7 +632,7 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
             break;
         }
     } else {
-        transform(obj_avpag_transf_values);
+        aplicar_transformaciones(avpag_values);
     }
 break;
 }

@@ -1,0 +1,8 @@
+cambiar transf_values y sus variables
+cambiar modo de transformar en el specialInput()
+
+cambiado:
+    -definitions.h struct transformaciones
+    -transformaciones.
+    -io.c (lo que le corresponde)
+

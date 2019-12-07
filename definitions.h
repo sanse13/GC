@@ -139,11 +139,11 @@ typedef struct lista_camera
     struct lista_camera *next;
 } lista_camera;
 
-typedef struct transf_values{
-    vector3 translate_v;
-    vector3 rotation_v;
-    vector3 scale_v;
-} transf_values;
+typedef struct transformaciones{
+    vector3 translate;
+    vector3 rotate;
+    vector3 scale;
+} transformaciones;
 /****************************
  * Structure to store a     *
  * pile of 3D objects       *

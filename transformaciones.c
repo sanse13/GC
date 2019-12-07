@@ -30,57 +30,57 @@ extern int coordenada_activa;
 extern int camera_object_mode;
 
 
-transf_values *obj_up_transf_values;
-transf_values *obj_down_transf_values;
-transf_values *obj_right_transf_values;
-transf_values *obj_left_transf_values;
-transf_values *obj_avpag_transf_values;
-transf_values *obj_repag_transf_values;
-transf_values *obj_plus_transf_values;
-transf_values *obj_minus_transf_values;
+transformaciones *up_values;
+transformaciones *down_values;
+transformaciones *right_values;
+transformaciones *left_values;
+transformaciones *avpag_values;
+transformaciones *repag_values;
+transformaciones *plus_values;
+transformaciones *minus_values;
 
-void init_transf_values(){
+void set_transformation_values(){
 
-    obj_up_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_down_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_right_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_left_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_avpag_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_repag_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_plus_transf_values = (transf_values *)malloc(sizeof(transf_values));
-    obj_minus_transf_values = (transf_values *)malloc(sizeof(transf_values));
+    up_values = (transformaciones *)malloc(sizeof(transformaciones));
+    down_values = (transformaciones *)malloc(sizeof(transformaciones));
+    right_values = (transformaciones *)malloc(sizeof(transformaciones));
+    left_values = (transformaciones *)malloc(sizeof(transformaciones));
+    avpag_values = (transformaciones *)malloc(sizeof(transformaciones));
+    repag_values = (transformaciones *)malloc(sizeof(transformaciones));
+    plus_values = (transformaciones *)malloc(sizeof(transformaciones));
+    minus_values = (transformaciones *)malloc(sizeof(transformaciones));
 
-    obj_up_transf_values->scale_v = (vector3){.x = 1.0f, .y = 2.0f, .z = 1.0f};
-    obj_up_transf_values->translate_v = (vector3){.x = 0.0f, .y = 1.0f, .z = 0.0f};
-    obj_up_transf_values->rotation_v = (vector3){.x = 1.0f, .y = 0.0f, .z = 0.0f};
+    up_values->translate = (vector3){.x = 0.0f, .y = 1.0f, .z = 0.0f};
+    up_values->rotate = (vector3){.x = 1.0f, .y = 0.0f, .z = 0.0f};
+    up_values->scale = (vector3){.x = 1.0f, .y = 2.0f, .z = 1.0f};
 
-    obj_down_transf_values->scale_v = (vector3){.x = 1.0f, .y = 0.5f, .z = 1.0f};
-    obj_down_transf_values->translate_v = (vector3){.x = 0.0f, .y = -1.0f, .z = 0.0f};
-    obj_down_transf_values->rotation_v = (vector3){.x = -1.0f, .y = 0.0f, .z = 0.0f};
+    down_values->translate = (vector3){.x = 0.0f, .y = -1.0f, .z = 0.0f};
+    down_values->rotate = (vector3){.x = -1.0f, .y = 0.0f, .z = 0.0f};
+    down_values->scale = (vector3){.x = 1.0f, .y = 0.5f, .z = 1.0f};
 
-    obj_right_transf_values->scale_v = (vector3){.x = 2.0f, .y = 1.0f, .z = 1.0f};
-    obj_right_transf_values->translate_v = (vector3){.x = 1.0f, .y = 0.0f, .z = 0.0f};
-    obj_right_transf_values->rotation_v = (vector3){.x = 0.0f, .y = 1.0f, .z = 0.0f};
+    right_values->translate = (vector3){.x = 1.0f, .y = 0.0f, .z = 0.0f};
+    right_values->rotate = (vector3){.x = 0.0f, .y = 1.0f, .z = 0.0f};
+    right_values->scale = (vector3){.x = 2.0f, .y = 1.0f, .z = 1.0f};
 
-    obj_left_transf_values->scale_v = (vector3){.x = 0.5f, .y = 1.0f, .z = 1.0f};
-    obj_left_transf_values->translate_v = (vector3){.x = -1.0f, .y = 0.0f, .z = 0.0f};
-    obj_left_transf_values->rotation_v = (vector3){.x = 0.0f, .y = -1.0f, .z = 0.0f};
+    left_values->translate = (vector3){.x = -1.0f, .y = 0.0f, .z = 0.0f};
+    left_values->rotate = (vector3){.x = 0.0f, .y = -1.0f, .z = 0.0f};
+    left_values->scale = (vector3){.x = 0.5f, .y = 1.0f, .z = 1.0f};
 
-    obj_avpag_transf_values->scale_v = (vector3){.x = 1.0f, .y = 1.0f, .z = 1.5f};
-    obj_avpag_transf_values->translate_v = (vector3){.x = 0.0f, .y = 0.0f, .z = 1.0f};
-    obj_avpag_transf_values->rotation_v = (vector3){.x = 0.0f, .y = 0.0f, .z = 1.0f};
+    avpag_values->translate = (vector3){.x = 0.0f, .y = 0.0f, .z = 1.0f};
+    avpag_values->rotate = (vector3){.x = 0.0f, .y = 0.0f, .z = 1.0f};
+    avpag_values->scale = (vector3){.x = 1.0f, .y = 1.0f, .z = 1.5f};
 
-    obj_repag_transf_values->scale_v = (vector3){.x = 1.0f, .y = 1.0f, .z = 0.5f};
-    obj_repag_transf_values->translate_v = (vector3){.x = 0.0f, .y = 0.0f, .z = -1.0f};
-    obj_repag_transf_values->rotation_v = (vector3){.x = 0.0f, .y = 0.0f, .z = -1.0f};
+    repag_values->translate = (vector3){.x = 0.0f, .y = 0.0f, .z = -1.0f};
+    repag_values->rotate = (vector3){.x = 0.0f, .y = 0.0f, .z = -1.0f};
+    repag_values->scale = (vector3){.x = 1.0f, .y = 1.0f, .z = 0.5f};
 
-    obj_plus_transf_values->scale_v = (vector3){.x = 1.5f, .y = 1.5f, .z = 1.5f};
+    plus_values->scale = (vector3){.x = 1.5f, .y = 1.5f, .z = 1.5f};
 
-    obj_minus_transf_values->scale_v = (vector3){.x = 0.5f, .y = 0.5f, .z = 0.5f};
+    minus_values->scale = (vector3){.x = 0.5f, .y = 0.5f, .z = 0.5f};
 }
 
 
-void transf_matrix_init(){
+void transformation_matrix(){
 
     glMatrixMode(GL_MODELVIEW);
     if (modo_activo == MODO_OBJ){
@@ -101,7 +101,7 @@ void transf_matrix_init(){
     }
 }
 
-void transf_matrix_set(){
+void set_transformation_matrix(){
 
     GLfloat m_aux[16];
     if (modo_activo == MODO_OBJ){
@@ -133,31 +133,31 @@ void transf_matrix_set(){
         }
 }
 
-void transform(transf_values *values){
+void aplicar_transformaciones(transformaciones *values){
 
-    transf_matrix_init();
+    transformation_matrix();
 
     switch (transformacion_activa)
     {
     case TRASLACION:
-        glTranslatef(values->translate_v.x, values->translate_v.y, values->translate_v.z);
+        glTranslatef(values->translate.x, values->translate.y, values->translate.z);
         break;
     
     case ROTACION:
-        glRotatef(18.0f, values->rotation_v.x, values->rotation_v.y, values->rotation_v.z);
+        glRotatef(18.0f, values->rotate.x, values->rotate.y, values->rotate.z);
         break;
 
     case ESCALADO:
         if (modo_activo == MODO_OBJ){
-            glScalef(values->scale_v.x, values->scale_v.y, values->scale_v.z);
+            glScalef(values->scale.x, values->scale.y, values->scale.z);
         }
         break; 
     }
 
-    transf_matrix_set();   
+    set_transformation_matrix();   
 }
 
-GLfloat distance_camera_to_obj(){
+GLfloat distancia_camara_objeto(){
     GLfloat px, py, pz;
 
     px = _selected_object->list_matrix->m[12] - _selected_camera->actual_camera->m_invert[12];
