@@ -7,8 +7,6 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define PI 3.14159265358979323846
-
 #define MODO_OBJ 0
 #define MODO_CAMARA 1
 
