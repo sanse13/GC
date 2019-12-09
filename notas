@@ -29,6 +29,7 @@ coeficiente especular varia el color del reflejo, ns nos dice si es buen o mal r
 
 luz: posicion, intensidad, lo que aporta la intensidad ambiental y la intensidad de luz que emite.
 
+2 opciones: o calcular las matrices de las luces o hacer las transformaciones a pelo :)
 
 
 					---------------------------PARTE REALIZADA--------------------------------

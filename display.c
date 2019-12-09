@@ -3,6 +3,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
+#include <math.h>
 
 /** EXTERNAL VARIABLES **/
 
@@ -21,7 +22,7 @@ vector3 normal;
 
 vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *vertex_table){
     vector3 normal_vector;
-
+    
     vector3 u;
     u.x = vertex_table[index2].coord.x - vertex_table[index1].coord.x;
     u.y = vertex_table[index2].coord.y - vertex_table[index1].coord.y;
@@ -135,15 +136,20 @@ void display(void) {
         glMultMatrixf(aux_obj->list_matrix->m);
         for (f = 0; f < aux_obj->num_faces; f++) {
             glBegin(GL_POLYGON);
+
+            index1 = aux_obj->face_table->vertex_table[0];
+            index2 = aux_obj->face_table->vertex_table[1];
+            index3 = aux_obj->face_table->vertex_table[2];
+
+            normal = calculate_surface_normal(index1, index2, index3, aux_obj->vertex_table);
+
             for (v = 0; v < aux_obj->face_table[f].num_vertices; v++) {
 
-                index1 = aux_obj->face_table->vertex_table[0];
-                index2 = aux_obj->face_table->vertex_table[1];
-                index3 = aux_obj->face_table->vertex_table[2];
-
-                normal = calculate_surface_normal(index1, index2, index3, aux_obj->vertex_table);
-
                 aux_obj->face_table[f].normal_vector = normal;
+
+                aux_obj->vertex_table[index1].normal_vector.x += aux_obj->face_table[f].normal_vector.x;
+                aux_obj->vertex_table[index2].normal_vector.y += aux_obj->face_table[f].normal_vector.y;
+                aux_obj->vertex_table[index3].normal_vector.z += aux_obj->face_table[f].normal_vector.z;
 
                 v_index = aux_obj->face_table[f].vertex_table[v];
                 glVertex3d(aux_obj->vertex_table[v_index].coord.x,
@@ -151,12 +157,34 @@ void display(void) {
                         aux_obj->vertex_table[v_index].coord.z);
 
                 glNormal3d(aux_obj->face_table[f].normal_vector.x,
-                aux_obj->face_table[f].normal_vector.y,
-                aux_obj->face_table[f].normal_vector.z);
+                        aux_obj->face_table[f].normal_vector.y,
+                        aux_obj->face_table[f].normal_vector.z);
 
             }
+
+
             glEnd();
         }
+
+        int norma = 0;
+        for (f = 0; f < aux_obj->num_faces; f++){
+            for (v = 0; v < aux_obj->face_table[f].num_vertices; v++){
+
+                v_index = aux_obj->face_table[f].vertex_table[v];
+
+                norma = sqrt(pow(aux_obj->vertex_table[v_index].normal_vector.x, 2)+
+                              pow(aux_obj->vertex_table[v_index].normal_vector.y, 2)+
+                              pow(aux_obj->vertex_table[v_index].normal_vector.z, 2));
+
+                aux_obj->vertex_table[v_index].normal_vector.x /= norma;
+                aux_obj->vertex_table[v_index].normal_vector.y /= norma;
+                aux_obj->vertex_table[v_index].normal_vector.z /= norma;
+                        
+            }
+            
+        }
+        
+
         glPopMatrix();
         aux_obj = aux_obj->next;
     }
