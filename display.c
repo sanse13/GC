@@ -19,6 +19,22 @@ extern lista_camera *_selected_camera;
 int index1, index2, index3;
 vector3 normal;
 
+void init(void){
+   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+   GLfloat mat_shininess[] = { 50.0 };
+   GLfloat light_position[] = { -1.0, -1.0, -1.0, 0.0 };
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glShadeModel (GL_SMOOTH);
+
+   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+   glEnable(GL_DEPTH_TEST);
+}
+
 
 vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *vertex_table){
     vector3 normal_vector;
@@ -73,6 +89,19 @@ void draw_axes()
  */
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    
+    if (width <= height)
+        glOrtho (-1.5, 1.5, -1.5*(GLfloat)height/(GLfloat)width,
+         1.5*(GLfloat)height/(GLfloat)width, -10.0, 10.0);
+    else
+        glOrtho (-1.5*(GLfloat)width/(GLfloat)height,
+         1.5*(GLfloat)width/(GLfloat)height, -1.5, 1.5, -10.0, 10.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     /*  Take care, the width and height are integer numbers, but the ratio is a GLdouble so, in order to avoid
      *  rounding the ratio to integer values we need to cast width and height before computing the ratio */
     _window_ratio = (GLdouble) width / (GLdouble) height;
@@ -86,8 +115,19 @@ void display(void) {
     GLint v_index, v, f;
     object3d *aux_obj = _first_object;
 
+
+    GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
+    GLfloat mat_ambient[] = { 0.7, 0.7, 0.7, 1.0 };
+    GLfloat mat_ambient_color[] = { 0.8, 0.8, 0.2, 1.0 };
+    GLfloat mat_diffuse[] = { 0.1, 0.5, 0.8, 1.0 };
+    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+    GLfloat no_shininess[] = { 0.0 };
+    GLfloat low_shininess[] = { 5.0 };
+    GLfloat high_shininess[] = { 100.0 };
+    GLfloat mat_emission[] = {0.3, 0.2, 0.2, 0.0};
+
     /* Clear the screen */
-    glClear(GL_DEPTH_BUFFER_BIT| GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT| GL_COLOR_BUFFER_BIT); 
 
     /* Define the projection */
     glMatrixMode(GL_PROJECTION);
@@ -119,8 +159,6 @@ void display(void) {
     glLoadIdentity();
     glLoadMatrixf(_selected_camera->actual_camera->m);
 
-    
-
     /*Now each of the objects in the list*/
     while (aux_obj != 0) {
 
@@ -133,6 +171,14 @@ void display(void) {
 
         /* Draw the object; for each face create a new polygon with the corresponding vertices */
         glPushMatrix();
+
+       
+        glMaterialfv(GL_FRONT, GL_AMBIENT, no_mat);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, no_mat);
+        glMaterialfv(GL_FRONT, GL_SHININESS, no_shininess);
+        glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
+
         glMultMatrixf(aux_obj->list_matrix->m);
         for (f = 0; f < aux_obj->num_faces; f++) {
             glBegin(GL_POLYGON);
@@ -166,7 +212,7 @@ void display(void) {
             glEnd();
         }
 
-        int norma = 0;
+        GLfloat norma = 0;
         for (f = 0; f < aux_obj->num_faces; f++){
             for (v = 0; v < aux_obj->face_table[f].num_vertices; v++){
 

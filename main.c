@@ -63,6 +63,8 @@ int main(int argc, char** argv) {
      glShadeModel(GL_FLAT);
 
     /* set the callback functions */
+    init();
+
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
