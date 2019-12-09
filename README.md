@@ -1,5 +1,6 @@
 # GC
 ---------Iluminación de la escena---------------
+
 F9	Activar/desactivar iluminación
 
 F1 - F8	Encender/apagar la funte de luz correspondiente. F1, F2, F3 corresponderán al sol, a una bonbilla, y a un foco asociado al objeto seleccionado
