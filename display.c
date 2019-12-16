@@ -133,20 +133,20 @@ void display(void) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    if (_selected_camera->actual_camera->proj->type == PROJECTION_PERSP){
-        glFrustum(_selected_camera->actual_camera->proj->left,
-        _selected_camera->actual_camera->proj->right,
-        _selected_camera->actual_camera->proj->bottom,
-        _selected_camera->actual_camera->proj->top,
-        _selected_camera->actual_camera->proj->near,
-        _selected_camera->actual_camera->proj->far);
+    if (_selected_camera->current_camera->proj->type == PROJECTION_PERSP){
+        glFrustum(_selected_camera->current_camera->proj->left,
+        _selected_camera->current_camera->proj->right,
+        _selected_camera->current_camera->proj->bottom,
+        _selected_camera->current_camera->proj->top,
+        _selected_camera->current_camera->proj->near,
+        _selected_camera->current_camera->proj->far);
     } else {
-        glOrtho(_selected_camera->actual_camera->proj->left * _window_ratio,
-        _selected_camera->actual_camera->proj->right * _window_ratio,
-        _selected_camera->actual_camera->proj->bottom,
-        _selected_camera->actual_camera->proj->top,
-        _selected_camera->actual_camera->proj->near,
-        _selected_camera->actual_camera->proj->far);    
+        glOrtho(_selected_camera->current_camera->proj->left * _window_ratio,
+        _selected_camera->current_camera->proj->right * _window_ratio,
+        _selected_camera->current_camera->proj->bottom,
+        _selected_camera->current_camera->proj->top,
+        _selected_camera->current_camera->proj->near,
+        _selected_camera->current_camera->proj->far);    
     }
 
   
@@ -157,7 +157,7 @@ void display(void) {
     /* Now we start drawing the object */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glLoadMatrixf(_selected_camera->actual_camera->m);
+    glLoadMatrixf(_selected_camera->current_camera->m);
 
     /*Now each of the objects in the list*/
     while (aux_obj != 0) {

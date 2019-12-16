@@ -168,9 +168,9 @@ void modo_analisis(int x, int y){
     GLfloat px, py, pz, distance;
     GLfloat m_minus[16], m_plus[16], m_rot[16];
 
-    px = _selected_object->list_matrix->m[12] - _selected_camera->actual_camera->m_invert[12];
-    py = _selected_object->list_matrix->m[13] - _selected_camera->actual_camera->m_invert[13];
-    pz = _selected_object->list_matrix->m[14] - _selected_camera->actual_camera->m_invert[14];
+    px = _selected_object->list_matrix->m[12] - _selected_camera->current_camera->m_invert[12];
+    py = _selected_object->list_matrix->m[13] - _selected_camera->current_camera->m_invert[13];
+    pz = _selected_object->list_matrix->m[14] - _selected_camera->current_camera->m_invert[14];
 
     distance = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 
@@ -198,9 +198,9 @@ void modo_analisis(int x, int y){
     glGetFloatv(GL_MODELVIEW_MATRIX, m_rot);
 
     glLoadIdentity();
-    glMultMatrixf(_selected_camera->actual_camera->m_invert);
+    glMultMatrixf(_selected_camera->current_camera->m_invert);
     glMultMatrixf(m_rot);
-    glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
+    glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
 
     matriz_inversa(_selected_camera);
 }
@@ -399,6 +399,10 @@ void keyboard(unsigned char key, int x, int y) {
 
     case 'k':
     case 'K': //activar modo camara, las transformaciones afectan a la camara
+        if (_selected_object == 0){
+            printf("Para activar modo camara debe de haber objeto. Pulse F.\n");
+            break;
+        }
         if (modo_activo != MODO_CAMARA){ 
             if (coordenada_activa == COORD_GLOBAL) centre_camera_to_obj(_selected_object);
             printf("Activado modo camara.\n");
@@ -410,12 +414,12 @@ void keyboard(unsigned char key, int x, int y) {
     case 'p':
     case 'P': //cambiando el tipo de proyeccion (perspectiva / paralela)
         if (modo_activo == MODO_CAMARA){
-            if (_selected_camera->actual_camera->proj->type == PROJECTION_PERSP){
+            if (_selected_camera->current_camera->proj->type == PROJECTION_PERSP){
                 printf("Cambiado a ortografica.\n");
-                _selected_camera->actual_camera->proj = global_ortho;
+                _selected_camera->current_camera->proj = global_ortho;
             } else {
                 printf("Cambiado a perspectiva.\n");
-                _selected_camera->actual_camera->proj = global_perspective;
+                _selected_camera->current_camera->proj = global_perspective;
             }
         }
 
@@ -474,8 +478,8 @@ case GLUT_KEY_UP:
                 }
                 break;
             case ESCALADO:
-                _selected_camera->actual_camera->proj->top -= 0.01;
-                _selected_camera->actual_camera->proj->bottom += 0.01;
+                _selected_camera->current_camera->proj->top -= 0.01;
+                _selected_camera->current_camera->proj->bottom += 0.01;
                 break;
             default:    
                 break; 
@@ -499,8 +503,8 @@ case GLUT_KEY_DOWN:
                 aplicar_transformaciones(down_values);
             break;
         case ESCALADO:
-            _selected_camera->actual_camera->proj->top += 0.01;
-            _selected_camera->actual_camera->proj->bottom -= 0.01;
+            _selected_camera->current_camera->proj->top += 0.01;
+            _selected_camera->current_camera->proj->bottom -= 0.01;
             break;
         }
     } else {
@@ -526,8 +530,8 @@ case GLUT_KEY_LEFT:
             break;
 
         case ESCALADO:
-            _selected_camera->actual_camera->proj->left += 0.01;
-            _selected_camera->actual_camera->proj->right -= 0.01;
+            _selected_camera->current_camera->proj->left += 0.01;
+            _selected_camera->current_camera->proj->right -= 0.01;
             break;
         }
     } else {
@@ -554,8 +558,8 @@ case GLUT_KEY_RIGHT:
             break;
 
         case ESCALADO:
-            _selected_camera->actual_camera->proj->left -= 0.01;
-            _selected_camera->actual_camera->proj->right += 0.01;
+            _selected_camera->current_camera->proj->left -= 0.01;
+            _selected_camera->current_camera->proj->right += 0.01;
             break;
         }
     } else {
@@ -573,9 +577,9 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
                 if (distancia_camara_objeto() > 2.5){
                     t_cam = (transformaciones*)malloc(sizeof(transformaciones));
                     t_cam->translate = (vector3){
-                        .x = -_selected_camera->actual_camera->m_invert[8],
-                        .y = -_selected_camera->actual_camera->m_invert[9],
-                        .z = -_selected_camera->actual_camera->m_invert[10]
+                        .x = -_selected_camera->current_camera->m_invert[8],
+                        .y = -_selected_camera->current_camera->m_invert[9],
+                        .z = -_selected_camera->current_camera->m_invert[10]
                     };
                     aplicar_transformaciones(t_cam);
                 }
@@ -590,8 +594,8 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
             break;
 
         case ESCALADO:
-            _selected_camera->actual_camera->proj->near -= 0.01;
-            _selected_camera->actual_camera->proj->far += 0.01;
+            _selected_camera->current_camera->proj->near -= 0.01;
+            _selected_camera->current_camera->proj->far += 0.01;
             break;
         }
     } else {
@@ -609,9 +613,9 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
                 if (distancia_camara_objeto() < 100){
                     t_cam = (transformaciones*)malloc(sizeof(transformaciones));
                     t_cam->translate = (vector3){
-                        .x = _selected_camera->actual_camera->m_invert[8],
-                        .y = _selected_camera->actual_camera->m_invert[9],
-                        .z = _selected_camera->actual_camera->m_invert[10]
+                        .x = _selected_camera->current_camera->m_invert[8],
+                        .y = _selected_camera->current_camera->m_invert[9],
+                        .z = _selected_camera->current_camera->m_invert[10]
                     };
                     aplicar_transformaciones(t_cam);
                 }
@@ -627,8 +631,8 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
             break;
 
         case ESCALADO:
-            _selected_camera->actual_camera->proj->near += 0.01;
-            _selected_camera->actual_camera->proj->far += 0.01;
+            _selected_camera->current_camera->proj->near += 0.01;
+            _selected_camera->current_camera->proj->far += 0.01;
             break;
         }
     } else {

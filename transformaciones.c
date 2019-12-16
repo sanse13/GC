@@ -88,7 +88,7 @@ void transformation_matrix(){
             glLoadIdentity();
     } else {
         if (coordenada_activa == COORD_LOCAL)
-            glLoadMatrixf(_selected_camera->actual_camera->m_invert);
+            glLoadMatrixf(_selected_camera->current_camera->m_invert);
         else {
             glLoadIdentity();
             glTranslatef(-_selected_object->list_matrix->m[12], 
@@ -118,14 +118,14 @@ void set_transformation_matrix(){
             add_camera_mode_obj(_selected_object);
         } else {
             if (coordenada_activa == COORD_LOCAL){
-                glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
+                glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
                 matriz_inversa(_selected_camera);
             } else {
                 glTranslatef(_selected_object->list_matrix->m[12],
                 _selected_object->list_matrix->m[13],
                 _selected_object->list_matrix->m[14]);
-                glMultMatrixf(_selected_camera->actual_camera->m_invert);
-                glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->actual_camera->m_invert);
+                glMultMatrixf(_selected_camera->current_camera->m_invert);
+                glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
                 matriz_inversa(_selected_camera);
             }
         }
@@ -158,9 +158,9 @@ void aplicar_transformaciones(transformaciones *values){
 GLfloat distancia_camara_objeto(){
     GLfloat px, py, pz;
 
-    px = _selected_object->list_matrix->m[12] - _selected_camera->actual_camera->m_invert[12];
-    py = _selected_object->list_matrix->m[13] - _selected_camera->actual_camera->m_invert[13];
-    pz = _selected_object->list_matrix->m[14] - _selected_camera->actual_camera->m_invert[14];
+    px = _selected_object->list_matrix->m[12] - _selected_camera->current_camera->m_invert[12];
+    py = _selected_object->list_matrix->m[13] - _selected_camera->current_camera->m_invert[13];
+    pz = _selected_object->list_matrix->m[14] - _selected_camera->current_camera->m_invert[14];
 
     return sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 }

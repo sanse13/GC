@@ -136,7 +136,7 @@ typedef struct camera
 
 typedef struct lista_camera
 {
-    camera *actual_camera;
+    camera *current_camera;
     struct lista_camera *next;
 } lista_camera;
 
@@ -158,7 +158,6 @@ struct object3d{
     point3 max;                         /* coordinates' bigger bounds */
     struct object3d *next;              /* next element in the pile of objects */
     list_matrix *list_matrix;
-
 };
 
 typedef struct object3d object3d;
