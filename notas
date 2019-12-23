@@ -40,3 +40,7 @@ luz: posicion, intensidad, lo que aporta la intensidad ambiental y la intensidad
 -calculados los vectores normales
 
 ¿cambiar ficheros .obj?
+
+· Calcular adecuadamente los vectores normales, NO en la parte del display.
+
+cut_off -> angulo del foco

@@ -59,6 +59,13 @@
 #define PROJECTION_PERSP 1
 #define PROJECTION_ORT 2
 
+#define SOL 0
+#define BOMBILLA 1
+#define FOCO 2
+#define FOCO_OBJETO 3
+
+#define FLAT 0
+#define SMOOTH 1
 /** STRUCTURES **/
 
 /****************************
@@ -140,7 +147,8 @@ typedef struct lista_camera
     struct lista_camera *next;
 } lista_camera;
 
-typedef struct transformaciones{
+typedef struct transformaciones
+{
     vector3 translate;
     vector3 rotate;
     vector3 scale;
@@ -149,7 +157,19 @@ typedef struct transformaciones{
  * Structure to store a     *
  * pile of 3D objects       *
  ****************************/
-struct object3d{
+typedef struct
+{
+    GLfloat m_diffuse[4];
+    GLfloat m_ambient[4];
+    GLfloat m_specular[4];
+    GLfloat m_position[4];
+    GLfloat no_shininess[1];
+}material_light;
+
+
+
+struct object3d
+{
     GLint num_vertices;                 /* number of vertices in the object*/
     vertex *vertex_table;               /* table of vertices */
     GLint num_faces;                    /* number of faces in the object */
@@ -158,7 +178,26 @@ struct object3d{
     point3 max;                         /* coordinates' bigger bounds */
     struct object3d *next;              /* next element in the pile of objects */
     list_matrix *list_matrix;
+    GLint flat_smooth;
+    material_light *material_light;
 };
+
+
+
+typedef struct
+{
+    GLfloat diffuse[4];
+    GLfloat ambient[4];
+    GLfloat specular[4];
+    GLfloat position[4];
+    GLint is_on;
+    GLint type;
+    GLfloat spot_direction[3];
+    GLfloat m_obj[16];
+    GLfloat cut_off;
+}objetos_luz;
+
+
 
 typedef struct object3d object3d;
 

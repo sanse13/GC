@@ -24,7 +24,7 @@ extern lista_camera *_selected_camera;
 
 extern int modo_activo;
 extern int transformacion_activa;
-extern int coordenada_activa;
+extern int coordenada;
 extern int camera_object_mode;
 
 
@@ -82,12 +82,12 @@ void transformation_matrix(){
 
     glMatrixMode(GL_MODELVIEW);
     if (modo_activo == MODO_OBJ){
-        if (coordenada_activa == COORD_LOCAL)
+        if (coordenada == COORD_LOCAL)
             glLoadMatrixf(_selected_object->list_matrix->m);
         else
             glLoadIdentity();
     } else {
-        if (coordenada_activa == COORD_LOCAL)
+        if (coordenada == COORD_LOCAL)
             glLoadMatrixf(_selected_camera->current_camera->m_invert);
         else {
             glLoadIdentity();
@@ -104,7 +104,7 @@ void set_transformation_matrix(){
     GLfloat m_aux[16];
     if (modo_activo == MODO_OBJ){
         list_matrix *n_ptr = (list_matrix*)malloc(sizeof(list_matrix));
-        if (coordenada_activa == COORD_LOCAL)
+        if (coordenada == COORD_LOCAL)
             glGetFloatv(GL_MODELVIEW_MATRIX, n_ptr->m);
         else {
             glMultMatrixf(_selected_object->list_matrix->m);
@@ -117,7 +117,7 @@ void set_transformation_matrix(){
         if (camera_object_mode == 1)
             add_camera_mode_obj(_selected_object);
         } else {
-            if (coordenada_activa == COORD_LOCAL){
+            if (coordenada == COORD_LOCAL){
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
                 matriz_inversa(_selected_camera);
             } else {

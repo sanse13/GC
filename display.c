@@ -4,6 +4,7 @@
 #include <GL/glu.h>
 #include <stdio.h>
 #include <math.h>
+#include "io.h"
 
 /** EXTERNAL VARIABLES **/
 
@@ -14,12 +15,14 @@ extern GLdouble _ortho_z_min,_ortho_z_max;
 
 extern object3d *_first_object;
 extern object3d *_selected_object;
-extern lista_camera *_selected_camera;  
+extern lista_camera *_selected_camera;
+objetos_luz global_lights[8];
+extern GLint flat_smooth;  
 
-int index1, index2, index3;
+//int index1, index2, index3;
 vector3 normal;
 
-void init(void){
+/*void init(void){
    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
    GLfloat mat_shininess[] = { 50.0 };
    GLfloat light_position[] = { -1.0, -1.0, -1.0, 0.0 };
@@ -33,7 +36,7 @@ void init(void){
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
    glEnable(GL_DEPTH_TEST);
-}
+}*/
 
 
 vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *vertex_table){
@@ -54,6 +57,52 @@ vector3 calculate_surface_normal(int index1, int index2, int index3, vertex *ver
     normal_vector.z = (u.x * v.y) - (u.y * v.x);
 
     return normal_vector;
+}
+
+void normal_vectors(){
+    GLint f, v, v_index, i;
+    GLint index1, index2, index3;
+    GLfloat norma;
+    vector3 vector_normal;
+    vector3 vector_normal_init = (vector3){.x = 0, .y = 0, .z = 0};
+
+    for (i = 0; i < _selected_object->num_vertices; i++)
+        _selected_object->vertex_table[i].normal_vector = vector_normal_init;
+    
+    for (f = 0; f < _selected_object->num_faces; f++){
+        index1 = _selected_object->face_table[f].vertex_table[0];
+        index2 = _selected_object->face_table[f].vertex_table[1];
+        index3 = _selected_object->face_table[f].vertex_table[2];
+
+        vector_normal = calculate_surface_normal(index1, index2, index3, _selected_object->vertex_table);
+
+        _selected_object->face_table[f].normal_vector = vector_normal;
+
+        norma = sqrt(pow(_selected_object->face_table[f].normal_vector.x, 2) +
+        pow(_selected_object->face_table[f].normal_vector.y, 2) +
+        pow(_selected_object->face_table[f].normal_vector.z, 2));
+
+        _selected_object->face_table[f].normal_vector.x /= norma;
+        _selected_object->face_table[f].normal_vector.y /= norma;
+        _selected_object->face_table[f].normal_vector.z /= norma;
+
+        for (v = 0; v < _selected_object->face_table[f].num_vertices; v++){
+            v_index = _selected_object->face_table[f].vertex_table[v];
+            _selected_object->vertex_table[v_index].normal_vector.x += _selected_object->face_table[f].normal_vector.x;
+            _selected_object->vertex_table[v_index].normal_vector.y += _selected_object->face_table[f].normal_vector.y;
+            _selected_object->vertex_table[v_index].normal_vector.z += _selected_object->face_table[f].normal_vector.z; 
+        }
+    }
+
+    for (i = 0; i < _selected_object->num_vertices; i++){
+        norma = sqrt(pow(_selected_object->vertex_table[i].normal_vector.x, 2) +
+        pow(_selected_object->vertex_table[i].normal_vector.y, 2) +
+        pow(_selected_object->vertex_table[i].normal_vector.z, 2));
+
+        _selected_object->vertex_table[i].normal_vector.x /= norma;
+        _selected_object->vertex_table[i].normal_vector.y /= norma;
+        _selected_object->vertex_table[i].normal_vector.z /= norma;
+    }
 }
 
 /**
@@ -112,19 +161,8 @@ void reshape(int width, int height) {
  * @brief Callback display function
  */
 void display(void) {
-    GLint v_index, v, f;
+    GLint v_index, v, f, i;
     object3d *aux_obj = _first_object;
-
-
-    GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat mat_ambient[] = { 0.7, 0.7, 0.7, 1.0 };
-    GLfloat mat_ambient_color[] = { 0.8, 0.8, 0.2, 1.0 };
-    GLfloat mat_diffuse[] = { 0.1, 0.5, 0.8, 1.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat no_shininess[] = { 0.0 };
-    GLfloat low_shininess[] = { 5.0 };
-    GLfloat high_shininess[] = { 100.0 };
-    GLfloat mat_emission[] = {0.3, 0.2, 0.2, 0.0};
 
     /* Clear the screen */
     glClear(GL_DEPTH_BUFFER_BIT| GL_COLOR_BUFFER_BIT); 
@@ -159,75 +197,68 @@ void display(void) {
     glLoadIdentity();
     glLoadMatrixf(_selected_camera->current_camera->m);
 
+    for (i = 0; i < 8; i++){
+        if (global_lights[i].position != 0 && global_lights[i].is_on == 1){
+            glPushMatrix();
+            glMultMatrixf(global_lights[i].m_obj);
+            put_light(i);
+            glPopMatrix();
+        }
+    }
+
     /*Now each of the objects in the list*/
     while (aux_obj != 0) {
 
         /* Select the color, depending on whether the current object is the selected one or not */
         if (aux_obj == _selected_object){
             glColor3f(KG_COL_SELECTED_R,KG_COL_SELECTED_G,KG_COL_SELECTED_B);
+            /*glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);*/
         }else{
             glColor3f(KG_COL_NONSELECTED_R,KG_COL_NONSELECTED_G,KG_COL_NONSELECTED_B);
+            /*glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
+            glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
+            glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
+            glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);*/
         }
-
+        glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
+        glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);
+        
         /* Draw the object; for each face create a new polygon with the corresponding vertices */
         glPushMatrix();
 
-       
-        glMaterialfv(GL_FRONT, GL_AMBIENT, no_mat);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, no_mat);
-        glMaterialfv(GL_FRONT, GL_SHININESS, no_shininess);
-        glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
-
         glMultMatrixf(aux_obj->list_matrix->m);
+
         for (f = 0; f < aux_obj->num_faces; f++) {
             glBegin(GL_POLYGON);
 
-            index1 = aux_obj->face_table->vertex_table[0];
-            index2 = aux_obj->face_table->vertex_table[1];
-            index3 = aux_obj->face_table->vertex_table[2];
-
-            normal = calculate_surface_normal(index1, index2, index3, aux_obj->vertex_table);
+            if (aux_obj->flat_smooth == 0){
+                glNormal3d(aux_obj->face_table[f].normal_vector.x,
+                aux_obj->face_table[f].normal_vector.y,
+                aux_obj->face_table[f].normal_vector.z);
+            }
 
             for (v = 0; v < aux_obj->face_table[f].num_vertices; v++) {
 
-                aux_obj->face_table[f].normal_vector = normal;
-
-                aux_obj->vertex_table[index1].normal_vector.x += aux_obj->face_table[f].normal_vector.x;
-                aux_obj->vertex_table[index2].normal_vector.y += aux_obj->face_table[f].normal_vector.y;
-                aux_obj->vertex_table[index3].normal_vector.z += aux_obj->face_table[f].normal_vector.z;
-
                 v_index = aux_obj->face_table[f].vertex_table[v];
+
+                if (aux_obj->flat_smooth == 1){
+                    glNormal3d(aux_obj->vertex_table[v_index].normal_vector.x,
+                    aux_obj->vertex_table[v_index].normal_vector.y,
+                    aux_obj->vertex_table[v_index].normal_vector.z);
+                }
+
                 glVertex3d(aux_obj->vertex_table[v_index].coord.x,
-                        aux_obj->vertex_table[v_index].coord.y,
-                        aux_obj->vertex_table[v_index].coord.z);
-
-                glNormal3d(aux_obj->face_table[f].normal_vector.x,
-                        aux_obj->face_table[f].normal_vector.y,
-                        aux_obj->face_table[f].normal_vector.z);
-
+                aux_obj->vertex_table[v_index].coord.y,
+                aux_obj->vertex_table[v_index].coord.z);
             }
 
 
             glEnd();
-        }
-
-        GLfloat norma = 0;
-        for (f = 0; f < aux_obj->num_faces; f++){
-            for (v = 0; v < aux_obj->face_table[f].num_vertices; v++){
-
-                v_index = aux_obj->face_table[f].vertex_table[v];
-
-                norma = sqrt(pow(aux_obj->vertex_table[v_index].normal_vector.x, 2)+
-                              pow(aux_obj->vertex_table[v_index].normal_vector.y, 2)+
-                              pow(aux_obj->vertex_table[v_index].normal_vector.z, 2));
-
-                aux_obj->vertex_table[v_index].normal_vector.x /= norma;
-                aux_obj->vertex_table[v_index].normal_vector.y /= norma;
-                aux_obj->vertex_table[v_index].normal_vector.z /= norma;
-                        
-            }
-            
         }
         
 

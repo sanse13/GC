@@ -21,6 +21,7 @@ object3d * _selected_object = 0;            /*Object currently selected*/
 lista_camera *_first_camera = 0;
 lista_camera *_selected_camera = 0;
 
+
 /** GENERAL INITIALIZATION **/
 void initialization (){
 
@@ -42,7 +43,6 @@ void initialization (){
 }
 
 
-
 /** MAIN FUNCTION **/
 int main(int argc, char** argv) {
 
@@ -58,12 +58,17 @@ int main(int argc, char** argv) {
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-     glEnable(GL_DEPTH_TEST); //activar test de profundidad
+    glEnable(GL_DEPTH_TEST); //activar test de profundidad
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_NORMALIZE);
 
-     glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
 
     /* set the callback functions */
-    init();
+    //init();
+    inicializar_materiales();
+    inicializar_luces();
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);

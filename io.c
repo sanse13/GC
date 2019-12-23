@@ -5,14 +5,17 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "camera.h"
+#include "display.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 #define PI 3.14159265358979323846
 #define ANGULO 18.0
+
 #define MODO_OBJ 0
 #define MODO_CAMARA 1
+#define MODO_LUZ 2
 
 #define TRASLACION 0
 #define ROTACION 1
@@ -20,6 +23,9 @@
 
 #define COORD_GLOBAL 0
 #define COORD_LOCAL 1
+
+#define LUZ_DESACTIVADA 0
+#define LUZ_ACTIVADA 1
 
 //comenzar programa con alguna transformacion activa
 
@@ -45,10 +51,20 @@ extern transformaciones *repag_values;
 extern transformaciones *plus_values;
 extern transformaciones *minus_values;
 
+extern objetos_luz global_lights[];
+extern GLint flat_smooth;
+
 int camera_object_mode = 0;
 int modo_activo = MODO_OBJ;
 int transformacion_activa = TRASLACION;
-int coordenada_activa = COORD_GLOBAL;
+int coordenada = COORD_GLOBAL;
+int modo_luz = LUZ_ACTIVADA;
+int luz_activada = 1;
+int _selected_light = 0;
+
+
+material_light *ruby, *obsidian;
+
 
 list_matrix *newptr;
 vector3 camera_pos;
@@ -108,7 +124,6 @@ void global_traslation(float x, float y, float z){
     newptr->nextptr = _selected_object->list_matrix;
     _selected_object->list_matrix = newptr;
     glutPostRedisplay();
-    
 }
 
 void rotation(GLfloat x, GLfloat y, GLfloat z){
@@ -153,7 +168,7 @@ void global_scalation(float x, float y, float z){
     glutPostRedisplay();
 }
 
-void set_identity(GLfloat *m){
+void matriz_identidad(GLfloat *m){
     int i, j;
     for (i = 0; i < 4; i++){
         for (j = 0; j < 4; j++){
@@ -174,7 +189,7 @@ void modo_analisis(int x, int y){
 
     distance = sqrt(pow(px, 2) + pow(py, 2) + pow(pz, 2));
 
-    set_identity(m_minus); set_identity(m_plus); set_identity(m_rot);
+    matriz_identidad(m_minus); matriz_identidad(m_plus); matriz_identidad(m_rot);
 
     m_minus[12] = 0; m_minus[13] = 0; m_minus[14] = -distance;
     m_plus[12] = 0; m_plus[13] = 0; m_plus[14] = distance;
@@ -218,6 +233,274 @@ void free_ptr(object3d *object){
             free(object);
 }
 
+void inicializar_luces(){
+    objetos_luz bombilla, sol, foco;
+
+    bombilla.position[0] = 0.0f;
+    bombilla.position[1] = 1.0f;
+    bombilla.position[2] = 0.0f;
+    bombilla.position[3] = 1.0f;
+    bombilla.ambient[0] = 1.2f;
+    bombilla.ambient[1] = 1.2f;
+    bombilla.ambient[2] = 1.2f;
+    bombilla.ambient[3] = 1.0f;
+    bombilla.diffuse[0] = 1.0f;
+    bombilla.diffuse[1] = 1.0f;
+    bombilla.diffuse[2] = 1.0f;
+    bombilla.diffuse[3] = 1.0f;
+    bombilla.specular[0] = 1.0f;
+    bombilla.specular[1] = 1.0f;
+    bombilla.specular[2] = 1.0f;
+    bombilla.specular[3] = 1.0f;
+
+    sol.position[0] = 1.0f;
+    sol.position[1] = 1.0f;
+    sol.position[2] = 0.0f;
+    sol.position[3] = 0.0f;
+    sol.ambient[0] = 1.2f;
+    sol.ambient[1] = 1.2f;
+    sol.ambient[2] = 1.2f;
+    sol.ambient[3] = 1.0f;
+    sol.diffuse[0] = 1.0f;
+    sol.diffuse[1] = 1.0f;
+    sol.diffuse[2] = 1.0f;
+    sol.diffuse[3] = 1.0f;
+    sol.specular[0] = 1.0f;
+    sol.specular[1] = 1.0f;
+    sol.specular[2] = 1.0f;
+    sol.specular[3] = 1.0f;
+
+    foco.position[0] = 0.0f;
+    foco.position[1] = 0.0f;
+    foco.position[2] = 0.0f;
+    foco.position[3] = 1.0f;
+    foco.ambient[0] = 0.05f;
+    foco.ambient[1] = 0.0f;
+    foco.ambient[2] = 0.0f;
+    foco.ambient[3] = 1.0f;
+    foco.diffuse[0] = 0.5f;
+    foco.diffuse[1] = 0.0f;
+    foco.diffuse[2] = 0.0f;
+    foco.diffuse[3] = 1.0f;
+    foco.specular[0] = 0.99f;
+    foco.specular[1] = 0.0f;
+    foco.specular[2] = 0.0f;
+    foco.specular[3] = 1.0f;
+    foco.cut_off = 45.0f;
+    foco.spot_direction[0] = 0.0f;
+    foco.spot_direction[1] = 0.0f;
+    foco.spot_direction[2] = 1.0f;
+    foco.is_on = 0;
+    
+    global_lights[2] = foco;
+}
+
+void put_light(GLint i){
+    switch (i){
+    case 0:
+        glLightfv(GL_LIGHT0, GL_POSITION, global_lights[i].position);
+        glLightfv(GL_LIGHT1, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT1, GL_SPECULAR, global_lights[i].specular); 
+        break;
+    
+    case 1:
+        glLightfv(GL_LIGHT1, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT1, GL_SPECULAR, global_lights[i].specular); 
+        glLightfv(GL_LIGHT1, GL_POSITION, global_lights[i].position); 
+        glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f); 
+        glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f); 
+        glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.1f);
+        break;
+
+    case 2:
+        glLightfv(GL_LIGHT2, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT2, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT2, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT2, GL_POSITION, global_lights[i].position); 
+        glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+        glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 1.0f);
+        glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 0.2f);
+        glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.1f);
+        glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, global_lights[2].cut_off);
+        break;
+
+    case 3:
+        glLightfv(GL_LIGHT3, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT3, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT3, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT3, GL_POSITION, global_lights[i].position); 
+        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
+            glLightf(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 1.0f);
+            glLightf(GL_LIGHT3, GL_LINEAR_ATTENUATION, 0.2f);
+            glLightf(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.1f);
+        }
+
+        if (global_lights[i].type == FOCO){
+            glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+            glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, global_lights[i].cut_off);
+        }
+        break;
+
+    case 4:
+        glLightfv(GL_LIGHT4, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT4, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT4, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT4, GL_POSITION, global_lights[i].position); 
+        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
+            glLightf(GL_LIGHT4, GL_CONSTANT_ATTENUATION, 1.0f);
+            glLightf(GL_LIGHT4, GL_LINEAR_ATTENUATION, 0.2f);
+            glLightf(GL_LIGHT4, GL_QUADRATIC_ATTENUATION, 0.1f);
+        }
+        if (global_lights[i].type == FOCO){
+             glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+             glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, global_lights[i].cut_off);
+        }
+        break;
+
+    case 5:
+        glLightfv(GL_LIGHT5, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT5, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT5, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT5, GL_POSITION, global_lights[i].position); 
+        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
+            glLightf(GL_LIGHT5, GL_CONSTANT_ATTENUATION, 1.0f);
+            glLightf(GL_LIGHT5, GL_LINEAR_ATTENUATION, 0.2f);
+            glLightf(GL_LIGHT5, GL_QUADRATIC_ATTENUATION, 0.1f);
+        }
+        if (global_lights[i].type == FOCO){
+            glLightfv(GL_LIGHT5, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+            glLightf(GL_LIGHT5, GL_SPOT_CUTOFF, global_lights[i].cut_off);
+        }
+        break;
+
+    case 6:
+        glLightfv(GL_LIGHT6, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT6, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT6, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT6, GL_POSITION, global_lights[i].position); 
+        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
+            glLightf(GL_LIGHT6, GL_CONSTANT_ATTENUATION, 1.0f);
+            glLightf(GL_LIGHT6, GL_LINEAR_ATTENUATION, 0.2f);
+            glLightf(GL_LIGHT6, GL_QUADRATIC_ATTENUATION, 0.1f);
+        }
+        if (global_lights[i].type == FOCO){
+            glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+            glLightf(GL_LIGHT6, GL_SPOT_CUTOFF, global_lights[i].cut_off);
+        }
+        break;
+
+    case 7:
+        glLightfv(GL_LIGHT7, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT7, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT7, GL_SPECULAR, global_lights[i].specular);
+        glLightfv(GL_LIGHT7, GL_POSITION, global_lights[i].position); 
+        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
+            glLightf(GL_LIGHT7, GL_CONSTANT_ATTENUATION, 1.0f);
+            glLightf(GL_LIGHT7, GL_LINEAR_ATTENUATION, 0.2f);
+            glLightf(GL_LIGHT7, GL_QUADRATIC_ATTENUATION, 0.1f);
+        }
+        if (global_lights[i].type == FOCO){
+            glLightfv(GL_LIGHT7, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
+            glLightf(GL_LIGHT7, GL_SPOT_CUTOFF, global_lights[i].cut_off);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void set_m_spotlight(){
+    int i;
+    for (i = 0; i < 16; i++){
+        global_lights[2].m_obj[i] = _selected_object->list_matrix->m[i];
+    }
+}
+
+void init_obj_spotlight(){
+    global_lights[2].position[0] = _selected_object->max.x / 2;
+    global_lights[2].position[1] = _selected_object->max.y / 2;
+    global_lights[2].position[2] = _selected_object->max.z;
+    global_lights[2].position[3] = 1;
+
+    global_lights[2].ambient[0] = 1.5f;
+    global_lights[2].ambient[1] = 1.5f;
+    global_lights[2].ambient[2] = 1.5f;
+    global_lights[2].ambient[3] = 1.0f;
+
+    global_lights[2].diffuse[0] = 1.5f;
+    global_lights[2].diffuse[1] = 1.5f;
+    global_lights[2].diffuse[2] = 1.5f;
+    global_lights[2].diffuse[3] = 1.0f;
+
+    global_lights[2].specular[0] = 1.0f;
+    global_lights[2].specular[1] = 1.0f;
+    global_lights[2].specular[2] = 1.0f;
+    global_lights[2].specular[3] = 1.0f;
+
+    global_lights[2].cut_off = 45.0f;
+
+    global_lights[2].spot_direction[0] = 0.0f;
+    global_lights[2].spot_direction[1] = 0.0f;
+    global_lights[2].spot_direction[2] = 1.0f;
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    put_light(2);
+    set_m_spotlight();
+    global_lights[2].type = FOCO_OBJETO;
+    global_lights[2].is_on = 0;
+}
+
+void inicializar_materiales(){
+    ruby = (material_light*)malloc(sizeof(material_light));
+    obsidian = (material_light*)malloc(sizeof(material_light));
+
+    ruby->m_ambient[0] = 0.1745f;
+    ruby->m_ambient[1] = 0.01175f;
+    ruby->m_ambient[2] = 0.01175f;
+    ruby->m_ambient[3] = 0.55f;
+    ruby->m_diffuse[0] = 0.61424f;
+    ruby->m_diffuse[1] = 0.04136f;
+    ruby->m_diffuse[2] = 0.04136f;
+    ruby->m_diffuse[3] = 0.55f;
+    ruby->m_specular[0] = 0.727811f;
+    ruby->m_specular[1] = 0.626959f;
+    ruby->m_specular[2] = 0.626959f;
+    ruby->m_specular[3] = 0.55f;
+    ruby->no_shininess[0] = 76.8f;
+
+    obsidian->m_ambient[0] = 0.05375f;
+    obsidian->m_ambient[1] = 0.05f;
+    obsidian->m_ambient[2] = 0.06625f;
+    obsidian->m_ambient[3] = 0.82f;
+    obsidian->m_diffuse[0] = 0.18275f;
+    obsidian->m_diffuse[1] = 0.17f;
+    obsidian->m_diffuse[2] = 0.22525f;
+    obsidian->m_diffuse[3] = 0.82f;
+    obsidian->m_specular[0] = 0.332741f;
+    obsidian->m_specular[1] = 0.328634f;
+    obsidian->m_specular[2] = 0.346435f;
+    obsidian->m_specular[3] = 0.82f;
+    obsidian->no_shininess[0] = 38.4f;
+}
+
+void anadir_material(object3d *_selected_object){
+    _selected_object->material_light = ruby;
+}
+
+void cambiar_material(object3d *_selected_object){
+    if (_selected_object->material_light == ruby){
+        _selected_object->material_light = obsidian;
+    } else {
+        _selected_object->material_light = ruby;
+    }
+}
+
+
+
 
 /**
  * @brief Callback function to control the basic keys
@@ -229,6 +512,7 @@ void keyboard(unsigned char key, int x, int y) {
 
     char* fname = malloc(sizeof (char)*128); /* Note that scanf adds a null character at the end of the vector*/
     int read = 0;
+    //glEnable(GL_LIGHTING);
     
     object3d *auxiliar_object = 0;
     GLdouble wd,he,midx,midy;
@@ -236,6 +520,8 @@ void keyboard(unsigned char key, int x, int y) {
     list_matrix *aux_list;
     camera *aux_camera = 0;
     lista_camera *aux_camera_obj = 0;
+
+    int i;
 
 
     switch (key) {
@@ -274,6 +560,11 @@ void keyboard(unsigned char key, int x, int y) {
                 auxiliar_object->next = _first_object;
                 _first_object = auxiliar_object;
                 _selected_object = _first_object;
+
+                normal_vectors();
+                anadir_material(_selected_object);
+                _selected_object->flat_smooth = FLAT;
+                init_obj_spotlight();
                 printf("%s\n",KG_MSSG_FILEREAD);
                 break;
             }
@@ -288,8 +579,12 @@ void keyboard(unsigned char key, int x, int y) {
         /*The selection is circular, thus if we move out of the list we go back to the first element*/
         if (_selected_object == 0) _selected_object = _first_object;
 
-        if (modo_activo == MODO_CAMARA && coordenada_activa == COORD_GLOBAL)
+        if (_selected_object != 0) init_obj_spotlight();
+
+        if (modo_activo == MODO_CAMARA && coordenada == COORD_GLOBAL)
             centre_camera_to_obj(_selected_object);
+        if (camera_object_mode == 1) add_camera_mode_obj(_selected_object);
+
         break;
 
     case 127: /* <SUPR> */
@@ -321,15 +616,21 @@ void keyboard(unsigned char key, int x, int y) {
                 /*and update the selection*/
                 _selected_object = auxiliar_object;
             }
+            if (_selected_object != 0) init_obj_spotlight();
         }
     break;
 
     case '-':
         global_scalation(0.5f, 0.5f, 0.5f);
+        if (global_lights[_selected_light].type == FOCO || 
+            global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off -= 3;
     break;
 
     case '+':
         global_scalation(2.0f, 2.0f, 2.0f);
+        if (global_lights[_selected_light].type == FOCO || 
+            global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off += 3;
+
         
     break;
 
@@ -359,17 +660,17 @@ void keyboard(unsigned char key, int x, int y) {
 
     case 'g':
     case 'G': 
-        if (coordenada_activa != COORD_GLOBAL){
+        if (coordenada != COORD_GLOBAL){
             if (modo_activo == MODO_CAMARA) centre_camera_to_obj(_selected_object);
             printf("Activadas transformaciones en mundo.\n");
-            coordenada_activa = COORD_GLOBAL;
+            coordenada = COORD_GLOBAL;
         }
     break;
 
     case 'l':
     case 'L': 
-        if (coordenada_activa != COORD_LOCAL){
-            coordenada_activa = COORD_LOCAL;    
+        if (coordenada != COORD_LOCAL){
+            coordenada = COORD_LOCAL;    
             printf("Activadas transformaciones locales.\n");
         
         }
@@ -399,13 +700,10 @@ void keyboard(unsigned char key, int x, int y) {
 
     case 'k':
     case 'K': //activar modo camara, las transformaciones afectan a la camara
-        if (_selected_object == 0){
-            printf("Para activar modo camara debe de haber objeto. Pulse F.\n");
-            break;
-        }
-        if (modo_activo != MODO_CAMARA){ 
-            if (coordenada_activa == COORD_GLOBAL) centre_camera_to_obj(_selected_object);
-            printf("Activado modo camara.\n");
+        if (camera_object_mode == 0 && modo_activo != MODO_CAMARA){
+            if (_selected_object != 0 && coordenada == COORD_GLOBAL)
+                centre_camera_to_obj(_selected_object);
+            printf("Modo camara activado.\n");
             modo_activo = MODO_CAMARA;
         }
         
@@ -422,10 +720,36 @@ void keyboard(unsigned char key, int x, int y) {
                 _selected_camera->current_camera->proj = global_perspective;
             }
         }
+    break;
 
+    case 'a':
+    case 'A':
+        if (modo_activo != MODO_LUZ){
+            printf("Modo luz activado.\n");
+            modo_activo = MODO_LUZ;
+        }
 
     break;
 
+    case '1':
+        _selected_light = 0;
+        printf("SOL seleccionado.\n");
+    break;
+
+    case '2':
+        _selected_light = 1;
+        printf("BOMBILLA seleccionada.\n");
+    break;
+
+    case '3':
+        _selected_light = 2;
+        printf("FOCO seleccionado.\n");
+    break;
+
+    case 'w':
+    case 'W':
+        cambiar_material(_selected_object);
+    break;
     
 
 
@@ -458,7 +782,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 void SpecialInput(int key, int x, int y){
 
-transformaciones *t_cam;
+transformaciones *camara;
 glMatrixMode(GL_MODELVIEW);
 switch(key){
 
@@ -467,11 +791,11 @@ case GLUT_KEY_UP:
     if (modo_activo == MODO_CAMARA){
         switch(transformacion_activa){
             case TRASLACION:
-                if (coordenada_activa == COORD_LOCAL)
+                if (coordenada == COORD_LOCAL)
                     aplicar_transformaciones(up_values);
                 break;
             case ROTACION:
-                if (coordenada_activa == COORD_GLOBAL){
+                if (coordenada == COORD_GLOBAL){
                     modo_analisis(-1, 0);
                 } else {
                     aplicar_transformaciones(up_values);
@@ -493,11 +817,11 @@ case GLUT_KEY_DOWN:
     if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
-            if (coordenada_activa == COORD_LOCAL)
+            if (coordenada == COORD_LOCAL)
                 aplicar_transformaciones(down_values);
             break;
         case ROTACION:
-            if (coordenada_activa == COORD_GLOBAL)
+            if (coordenada == COORD_GLOBAL)
                 modo_analisis(1, 0);
             else
                 aplicar_transformaciones(down_values);
@@ -505,6 +829,8 @@ case GLUT_KEY_DOWN:
         case ESCALADO:
             _selected_camera->current_camera->proj->top += 0.01;
             _selected_camera->current_camera->proj->bottom -= 0.01;
+            break;
+        default:
             break;
         }
     } else {
@@ -518,12 +844,12 @@ case GLUT_KEY_LEFT:
     if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
-            if (coordenada_activa == COORD_LOCAL)
+            if (coordenada == COORD_LOCAL)
                 aplicar_transformaciones(left_values);
             break;
 
         case ROTACION:
-            if (coordenada_activa == COORD_GLOBAL)
+            if (coordenada == COORD_GLOBAL)
                 modo_analisis(0, -1);
             else
                 aplicar_transformaciones(left_values);
@@ -532,6 +858,8 @@ case GLUT_KEY_LEFT:
         case ESCALADO:
             _selected_camera->current_camera->proj->left += 0.01;
             _selected_camera->current_camera->proj->right -= 0.01;
+            break;
+        default:
             break;
         }
     } else {
@@ -546,12 +874,12 @@ case GLUT_KEY_RIGHT:
         switch (transformacion_activa){
 
         case TRASLACION:
-            if (coordenada_activa == COORD_LOCAL)
+            if (coordenada == COORD_LOCAL)
                 aplicar_transformaciones(right_values);
             break;
         
         case ROTACION:
-            if (coordenada_activa == COORD_GLOBAL)
+            if (coordenada == COORD_GLOBAL)
                 modo_analisis(0, 1);
             else
                 aplicar_transformaciones(right_values);
@@ -560,6 +888,8 @@ case GLUT_KEY_RIGHT:
         case ESCALADO:
             _selected_camera->current_camera->proj->left -= 0.01;
             _selected_camera->current_camera->proj->right += 0.01;
+            break;
+        default:
             break;
         }
     } else {
@@ -573,15 +903,15 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
     if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
-            if (coordenada_activa == COORD_GLOBAL){
+            if (coordenada == COORD_GLOBAL){
                 if (distancia_camara_objeto() > 2.5){
-                    t_cam = (transformaciones*)malloc(sizeof(transformaciones));
-                    t_cam->translate = (vector3){
+                    camara = (transformaciones*)malloc(sizeof(transformaciones));
+                    camara->translate = (vector3){
                         .x = -_selected_camera->current_camera->m_invert[8],
                         .y = -_selected_camera->current_camera->m_invert[9],
                         .z = -_selected_camera->current_camera->m_invert[10]
                     };
-                    aplicar_transformaciones(t_cam);
+                    aplicar_transformaciones(camara);
                 }
             } else {
                 aplicar_transformaciones(repag_values);
@@ -589,13 +919,15 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
             break;
         
         case ROTACION:
-            if (coordenada_activa == COORD_LOCAL)
+            if (coordenada == COORD_LOCAL)
                 aplicar_transformaciones(repag_values);
             break;
 
         case ESCALADO:
             _selected_camera->current_camera->proj->near -= 0.01;
             _selected_camera->current_camera->proj->far += 0.01;
+            break;
+        default:
             break;
         }
     } else {
@@ -609,15 +941,15 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
     if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
-            if (coordenada_activa == COORD_GLOBAL){
+            if (coordenada == COORD_GLOBAL){
                 if (distancia_camara_objeto() < 100){
-                    t_cam = (transformaciones*)malloc(sizeof(transformaciones));
-                    t_cam->translate = (vector3){
+                    camara = (transformaciones*)malloc(sizeof(transformaciones));
+                    camara->translate = (vector3){
                         .x = _selected_camera->current_camera->m_invert[8],
                         .y = _selected_camera->current_camera->m_invert[9],
                         .z = _selected_camera->current_camera->m_invert[10]
                     };
-                    aplicar_transformaciones(t_cam);
+                    aplicar_transformaciones(camara);
                 }
             } else {
                 aplicar_transformaciones(avpag_values);
@@ -625,7 +957,7 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
             break;
         
         case ROTACION:
-            if (coordenada_activa == COORD_LOCAL){
+            if (coordenada == COORD_LOCAL){
                 aplicar_transformaciones(avpag_values);
             }
             break;
@@ -634,10 +966,32 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
             _selected_camera->current_camera->proj->near += 0.01;
             _selected_camera->current_camera->proj->far += 0.01;
             break;
+        default:
+            break;
         }
     } else {
         aplicar_transformaciones(avpag_values);
     }
+break;
+
+case GLUT_KEY_F9:
+
+    if (modo_luz == LUZ_DESACTIVADA){
+        printf("Luz activada.\n");
+        modo_luz = LUZ_ACTIVADA;
+        glEnable(GL_LIGHTING);
+    } else {
+        printf("Luz desactivada.\n");
+        modo_luz = LUZ_DESACTIVADA;
+        glDisable(GL_LIGHTING);
+    }
+
+break;
+
+case GLUT_KEY_F1:
+
+    printf("F1.n\n");
+
 break;
 }
 
