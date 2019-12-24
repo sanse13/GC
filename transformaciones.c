@@ -2,6 +2,7 @@
 #include "definitions.h"
 #include "camera.h"
 #include "load_obj.h"
+#include "io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -26,6 +27,9 @@ extern int modo_activo;
 extern int transformacion_activa;
 extern int coordenada;
 extern int camera_object_mode;
+
+extern objetos_luz global_lights[];
+extern GLint _selected_light;
 
 
 transformaciones *up_values;
@@ -86,7 +90,7 @@ void transformation_matrix(){
             glLoadMatrixf(_selected_object->list_matrix->m);
         else
             glLoadIdentity();
-    } else {
+    } else if (modo_activo == MODO_CAMARA) {
         if (coordenada == COORD_LOCAL)
             glLoadMatrixf(_selected_camera->current_camera->m_invert);
         else {
@@ -96,7 +100,8 @@ void transformation_matrix(){
             -_selected_object->list_matrix->m[14]);
 
         }
-    }
+    } else 
+        glLoadMatrixf(global_lights[_selected_light].m_obj);
 }
 
 void set_transformation_matrix(){
@@ -116,7 +121,8 @@ void set_transformation_matrix(){
 
         if (camera_object_mode == 1)
             add_camera_mode_obj(_selected_object);
-        } else {
+        set_m_spotlight();
+        } else if (modo_activo == MODO_CAMARA) {
             if (coordenada == COORD_LOCAL){
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
                 matriz_inversa(_selected_camera);
@@ -128,7 +134,8 @@ void set_transformation_matrix(){
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
                 matriz_inversa(_selected_camera);
             }
-        }
+        } else 
+            glGetFloatv(GL_MODELVIEW_MATRIX, global_lights[_selected_light].m_obj);
 }
 
 void aplicar_transformaciones(transformaciones *values){

@@ -731,6 +731,10 @@ void keyboard(unsigned char key, int x, int y) {
 
     break;
 
+    case '0':
+        //insertar luz
+    break;
+
     case '1':
         _selected_light = 0;
         printf("SOL seleccionado.\n");
@@ -744,6 +748,31 @@ void keyboard(unsigned char key, int x, int y) {
     case '3':
         _selected_light = 2;
         printf("FOCO seleccionado.\n");
+    break;
+
+    case '4':
+        _selected_light = 3;
+        printf("Seleccionada LUZ 4.\n");
+    break;
+
+    case '5':
+        _selected_light = 4;
+        printf("Seleccionada LUZ 5.\n");
+    break;
+
+    case '6':
+        _selected_light = 5;
+        printf("Seleccionada LUZ 6.\n");
+    break;
+
+    case '7':
+        _selected_light = 6;
+        printf("Seleccionada LUZ 7.\n");
+    break;
+
+    case '8':
+        _selected_light = 7;
+        printf("Seleccionada LUZ 8.\n");
     break;
 
     case 'w':
@@ -808,8 +837,28 @@ case GLUT_KEY_UP:
             default:    
                 break; 
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ) {
         aplicar_transformaciones(up_values);
+    } else {
+        switch (transformacion_activa){
+        
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(up_values);
+                }
+        break;
+        
+        case ROTACION:
+                if (global_lights[_selected_light].type == SOL || 
+                    global_lights[_selected_light].type == FOCO){
+                        aplicar_transformaciones(up_values);
+                    }
+            break;
+        
+        default:
+            break;
+        }
     }
 break;
 
@@ -833,8 +882,27 @@ case GLUT_KEY_DOWN:
         default:
             break;
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ){
         aplicar_transformaciones(down_values);
+    } else {
+        switch (transformacion_activa){
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(down_values);
+                }
+            break;
+
+        case ROTACION:
+            if (global_lights[_selected_light].type == SOL ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(down_values);
+                }
+            break;
+        
+        default:
+            break;
+        }
     }
     
 break;
@@ -862,8 +930,26 @@ case GLUT_KEY_LEFT:
         default:
             break;
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ){
         aplicar_transformaciones(left_values);
+    } else {
+        switch (transformacion_activa){
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA || 
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(left_values);
+                }
+            break;
+
+        case ROTACION:
+            if (global_lights[_selected_light].type == FOCO){
+                aplicar_transformaciones(left_values);
+            }
+            break;
+        
+        default:
+            break;
+        }
     }
 
 break;
@@ -892,8 +978,26 @@ case GLUT_KEY_RIGHT:
         default:
             break;
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ){
         aplicar_transformaciones(right_values);
+    } else {
+        switch (transformacion_activa){
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(right_values);
+                }
+            break;
+
+        case ROTACION:
+            if (global_lights[_selected_light].type == FOCO){
+                aplicar_transformaciones(right_values);
+            }
+            break;
+        
+        default:
+            break;
+        }
     }
 
 break;
@@ -930,8 +1034,20 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
         default:
             break;
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ){
         aplicar_transformaciones(repag_values);
+    } else {
+        switch (transformacion_activa){
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(repag_values);
+                }
+            break;
+        
+        default:
+            break;
+        }
     }
     
 break;
@@ -969,8 +1085,20 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
         default:
             break;
         }
-    } else {
+    } else if (modo_activo == MODO_OBJ){
         aplicar_transformaciones(avpag_values);
+    } else {
+        switch (transformacion_activa){
+        case TRASLACION:
+            if (global_lights[_selected_light].type == BOMBILLA ||
+                global_lights[_selected_light].type == FOCO){
+                    aplicar_transformaciones(avpag_values);
+                }
+            break;
+        
+        default:
+            break;
+        }
     }
 break;
 
@@ -990,10 +1118,116 @@ break;
 
 case GLUT_KEY_F1:
 
-    printf("F1.n\n");
+    switch(global_lights[0].is_on){
+        case 0:
+            global_lights[0].is_on = 1;
+            glEnable(GL_LIGHT0);
+            printf("enciendo\n");
+            break;
+        case 1:
+            global_lights[0].is_on = 0;
+            glDisable(GL_LIGHT0);
+            printf("apago\n");
+            break;
+    }
+    
+break;
+
+case GLUT_KEY_F2:
+
+    if (global_lights[1].is_on == 0){
+        global_lights[1].is_on = 1;
+        glEnable(GL_LIGHT1);
+    } else {
+        global_lights[1].is_on = 0;
+        glDisable(GL_LIGHT1);
+    }
+    printf("bombilla\n");
 
 break;
+
+case GLUT_KEY_F3:
+
+    if (global_lights[2].is_on == 0){
+        global_lights[2].is_on = 1;
+        glEnable(GL_LIGHT2);
+    } else {
+        global_lights[2].is_on = 0;
+        glDisable(GL_LIGHT2);
+    }
+    printf("foco\n");
+
+break;
+
+case GLUT_KEY_F4:
+
+    if (global_lights[3].is_on == 0){
+        global_lights[3].is_on = 1;
+        glEnable(GL_LIGHT3);
+    } else {
+        global_lights[3].is_on = 0;
+        glDisable(GL_LIGHT3);
+    }
+
+break;
+
+case GLUT_KEY_F5:
+
+    if (global_lights[4].is_on == 0){
+        global_lights[4].is_on = 1;
+        glEnable(GL_LIGHT4);
+    } else {
+        global_lights[4].is_on = 0;
+        glDisable(GL_LIGHT4);
+    }
+
+break;
+
+case GLUT_KEY_F6:
+
+    if (global_lights[5].is_on == 0){
+        global_lights[5].is_on = 1;
+        glEnable(GL_LIGHT5);
+    } else {
+        global_lights[5].is_on = 0;
+        glDisable(GL_LIGHT5);
+    }
+
+break;
+
+case GLUT_KEY_F7:
+
+    if (global_lights[6].is_on == 0){
+        global_lights[6].is_on = 1;
+        glEnable(GL_LIGHT6);
+    } else {
+        global_lights[6].is_on = 0;
+        glDisable(GL_LIGHT6);
+    }
+
+break;
+
+case GLUT_KEY_F8:
+
+    if (global_lights[7].is_on == 0){
+        global_lights[7].is_on = 1;
+        glEnable(GL_LIGHT7);
+    } else {
+        global_lights[7].is_on = 0;
+        glDisable(GL_LIGHT7);
+    }
+
+break;
+
+case GLUT_KEY_F12:
+
+    if (_selected_object->flat_smooth == 0) _selected_object->flat_smooth = 1;
+    else  _selected_object->flat_smooth = 0;
+
+break;
+
 }
+
 
 glutPostRedisplay();
 }
