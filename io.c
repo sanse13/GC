@@ -617,14 +617,16 @@ void keyboard(unsigned char key, int x, int y) {
     break;
 
     case '-':
-        global_scalation(0.5f, 0.5f, 0.5f);
-        if (global_lights[_selected_light].type == FOCO || 
+        if (modo_activo == MODO_OBJ)
+            global_scalation(0.5f, 0.5f, 0.5f);
+        else if (global_lights[_selected_light].type == FOCO || 
             global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off -= 3;
     break;
 
     case '+':
-        global_scalation(2.0f, 2.0f, 2.0f);
-        if (global_lights[_selected_light].type == FOCO || 
+        if (modo_activo == MODO_OBJ)
+            global_scalation(2.0f, 2.0f, 2.0f);
+        else if (global_lights[_selected_light].type == FOCO || 
             global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off += 3;
 
         
