@@ -815,7 +815,9 @@ switch(key){
 
 case GLUT_KEY_UP:
 
-    if (modo_activo == MODO_CAMARA){
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(up_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch(transformacion_activa){
             case TRASLACION:
                 if (coordenada == COORD_LOCAL)
@@ -835,8 +837,6 @@ case GLUT_KEY_UP:
             default:    
                 break; 
         }
-    } else if (modo_activo == MODO_OBJ) {
-        aplicar_transformaciones(up_values);
     } else {
         switch (transformacion_activa){
         
@@ -861,7 +861,10 @@ case GLUT_KEY_UP:
 break;
 
 case GLUT_KEY_DOWN:
-    if (modo_activo == MODO_CAMARA){
+
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(down_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada == COORD_LOCAL)
@@ -880,8 +883,6 @@ case GLUT_KEY_DOWN:
         default:
             break;
         }
-    } else if (modo_activo == MODO_OBJ){
-        aplicar_transformaciones(down_values);
     } else {
         switch (transformacion_activa){
         case TRASLACION:
@@ -907,7 +908,9 @@ break;
 
 case GLUT_KEY_LEFT:
 
-    if (modo_activo == MODO_CAMARA){
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(left_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada == COORD_LOCAL)
@@ -928,13 +931,12 @@ case GLUT_KEY_LEFT:
         default:
             break;
         }
-    } else if (modo_activo == MODO_OBJ){
-        aplicar_transformaciones(left_values);
     } else {
         switch (transformacion_activa){
         case TRASLACION:
             if (global_lights[_selected_light].type == BOMBILLA || 
                 global_lights[_selected_light].type == FOCO){
+                    //printf("TRANSFORMANDO IZQUIERDA BOMBILLA\n");
                     aplicar_transformaciones(left_values);
                 }
             break;
@@ -954,7 +956,9 @@ break;
 
 case GLUT_KEY_RIGHT:
 
-    if (modo_activo == MODO_CAMARA){
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(right_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
 
         case TRASLACION:
@@ -976,8 +980,6 @@ case GLUT_KEY_RIGHT:
         default:
             break;
         }
-    } else if (modo_activo == MODO_OBJ){
-        aplicar_transformaciones(right_values);
     } else {
         switch (transformacion_activa){
         case TRASLACION:
@@ -1002,7 +1004,9 @@ break;
 
 case GLUT_KEY_PAGE_UP: //tecla Re Pág
 
-    if (modo_activo == MODO_CAMARA){
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(repag_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada == COORD_GLOBAL){
@@ -1032,8 +1036,6 @@ case GLUT_KEY_PAGE_UP: //tecla Re Pág
         default:
             break;
         }
-    } else if (modo_activo == MODO_OBJ){
-        aplicar_transformaciones(repag_values);
     } else {
         switch (transformacion_activa){
         case TRASLACION:
@@ -1052,7 +1054,9 @@ break;
 
 case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
     
-    if (modo_activo == MODO_CAMARA){
+    if (modo_activo == MODO_OBJ){
+        aplicar_transformaciones(avpag_values);
+    } else if (modo_activo == MODO_CAMARA){
         switch (transformacion_activa){
         case TRASLACION:
             if (coordenada == COORD_GLOBAL){
@@ -1083,8 +1087,6 @@ case GLUT_KEY_PAGE_DOWN: //tecla Av Pág no corregido
         default:
             break;
         }
-    } else if (modo_activo == MODO_OBJ){
-        aplicar_transformaciones(avpag_values);
     } else {
         switch (transformacion_activa){
         case TRASLACION:
@@ -1120,13 +1122,14 @@ case GLUT_KEY_F1:
         case 0:
             global_lights[0].is_on = 1;
             glEnable(GL_LIGHT0);
-            printf("enciendo\n");
+            //printf("enciendo\n");
             break;
         case 1:
             global_lights[0].is_on = 0;
             glDisable(GL_LIGHT0);
-            printf("apago\n");
+            //printf("apago\n");
             break;
+        printf("sol\n");
     }
     
 break;

@@ -139,18 +139,6 @@ void draw_axes()
 void reshape(int width, int height) {
     glViewport(0, 0, width, height);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    
-    if (width <= height)
-        glOrtho (-1.5, 1.5, -1.5*(GLfloat)height/(GLfloat)width,
-         1.5*(GLfloat)height/(GLfloat)width, -10.0, 10.0);
-    else
-        glOrtho (-1.5*(GLfloat)width/(GLfloat)height,
-         1.5*(GLfloat)width/(GLfloat)height, -1.5, 1.5, -10.0, 10.0);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
     /*  Take care, the width and height are integer numbers, but the ratio is a GLdouble so, in order to avoid
      *  rounding the ratio to integer values we need to cast width and height before computing the ratio */
     _window_ratio = (GLdouble) width / (GLdouble) height;
@@ -190,7 +178,7 @@ void display(void) {
   
 
     /*First, we draw the axes*/
-    draw_axes();
+    //draw_axes();
 
     /* Now we start drawing the object */
     glMatrixMode(GL_MODELVIEW);
@@ -198,7 +186,7 @@ void display(void) {
     glLoadMatrixf(_selected_camera->current_camera->m);
 
     for (i = 0; i < 8; i++){
-        if (global_lights[i].position != 0 && global_lights[i].is_on == 1){
+        if (global_lights[i].is_on == 1){
             glPushMatrix();
             glMultMatrixf(global_lights[i].m_obj);
             put_light(i);
@@ -212,21 +200,16 @@ void display(void) {
         /* Select the color, depending on whether the current object is the selected one or not */
         if (aux_obj == _selected_object){
             glColor3f(KG_COL_SELECTED_R,KG_COL_SELECTED_G,KG_COL_SELECTED_B);
-            /*glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
-            glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);*/
+            
         }else{
             glColor3f(KG_COL_NONSELECTED_R,KG_COL_NONSELECTED_G,KG_COL_NONSELECTED_B);
-            /*glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
-            glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
-            glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);*/
+
         }
         glMaterialfv(GL_FRONT, GL_AMBIENT, aux_obj->material_light->m_ambient);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, aux_obj->material_light->m_diffuse);
         glMaterialfv(GL_FRONT, GL_SPECULAR, aux_obj->material_light->m_specular);
         glMaterialfv(GL_FRONT, GL_SHININESS, aux_obj->material_light->no_shininess);
+        
         
         /* Draw the object; for each face create a new polygon with the corresponding vertices */
         glPushMatrix();
@@ -244,7 +227,7 @@ void display(void) {
 
             for (v = 0; v < aux_obj->face_table[f].num_vertices; v++) {
 
-                v_index = aux_obj->face_table[f].vertex_table[v];
+                v_index = _selected_object->face_table[f].vertex_table[v];
 
                 if (aux_obj->flat_smooth == 1){
                     glNormal3d(aux_obj->vertex_table[v_index].normal_vector.x,

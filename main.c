@@ -56,7 +56,15 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(KG_WINDOW_X, KG_WINDOW_Y);
     glutCreateWindow(KG_WINDOW_TITLE);
 
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(SpecialInput);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    inicializar_luces();
+    inicializar_materiales();
 
     glEnable(GL_DEPTH_TEST); //activar test de profundidad
     glEnable(GL_LIGHTING);
@@ -67,13 +75,10 @@ int main(int argc, char** argv) {
 
     /* set the callback functions */
     //init();
-    inicializar_materiales();
-    inicializar_luces();
+    //inicializar_materiales();
+    //inicializar_luces();
 
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(SpecialInput);
+
 
     /* this initialization has to be AFTER the creation of the window */
     initialization();
