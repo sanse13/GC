@@ -233,75 +233,13 @@ void free_ptr(object3d *object){
             free(object);
 }
 
-void inicializar_luces(){
-    objetos_luz bombilla, sol, foco;
-
-    bombilla.position[0] = 0.0f;
-    bombilla.position[1] = 1.0f;
-    bombilla.position[2] = 0.0f;
-    bombilla.position[3] = 1.0f;
-    bombilla.ambient[0] = 1.2f;
-    bombilla.ambient[1] = 1.2f;
-    bombilla.ambient[2] = 1.2f;
-    bombilla.ambient[3] = 1.0f;
-    bombilla.diffuse[0] = 1.0f;
-    bombilla.diffuse[1] = 1.0f;
-    bombilla.diffuse[2] = 1.0f;
-    bombilla.diffuse[3] = 1.0f;
-    bombilla.specular[0] = 1.0f;
-    bombilla.specular[1] = 1.0f;
-    bombilla.specular[2] = 1.0f;
-    bombilla.specular[3] = 1.0f;
-
-    sol.position[0] = 1.0f;
-    sol.position[1] = 1.0f;
-    sol.position[2] = 0.0f;
-    sol.position[3] = 0.0f;
-    sol.ambient[0] = 1.2f;
-    sol.ambient[1] = 1.2f;
-    sol.ambient[2] = 1.2f;
-    sol.ambient[3] = 1.0f;
-    sol.diffuse[0] = 1.0f;
-    sol.diffuse[1] = 1.0f;
-    sol.diffuse[2] = 1.0f;
-    sol.diffuse[3] = 1.0f;
-    sol.specular[0] = 1.0f;
-    sol.specular[1] = 1.0f;
-    sol.specular[2] = 1.0f;
-    sol.specular[3] = 1.0f;
-
-    foco.position[0] = 0.0f;
-    foco.position[1] = 0.0f;
-    foco.position[2] = 0.0f;
-    foco.position[3] = 1.0f;
-    foco.ambient[0] = 0.05f;
-    foco.ambient[1] = 0.0f;
-    foco.ambient[2] = 0.0f;
-    foco.ambient[3] = 1.0f;
-    foco.diffuse[0] = 0.5f;
-    foco.diffuse[1] = 0.0f;
-    foco.diffuse[2] = 0.0f;
-    foco.diffuse[3] = 1.0f;
-    foco.specular[0] = 0.99f;
-    foco.specular[1] = 0.0f;
-    foco.specular[2] = 0.0f;
-    foco.specular[3] = 1.0f;
-    foco.cut_off = 45.0f;
-    foco.spot_direction[0] = 0.0f;
-    foco.spot_direction[1] = 0.0f;
-    foco.spot_direction[2] = 1.0f;
-    foco.is_on = 0;
-    
-    global_lights[2] = foco;
-}
-
 void put_light(GLint i){
     switch (i){
     case 0:
         glLightfv(GL_LIGHT0, GL_POSITION, global_lights[i].position);
-        glLightfv(GL_LIGHT1, GL_AMBIENT, global_lights[i].ambient); 
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, global_lights[i].diffuse); 
-        glLightfv(GL_LIGHT1, GL_SPECULAR, global_lights[i].specular); 
+        glLightfv(GL_LIGHT0, GL_AMBIENT, global_lights[i].ambient); 
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, global_lights[i].diffuse); 
+        glLightfv(GL_LIGHT0, GL_SPECULAR, global_lights[i].specular); 
         break;
     
     case 1:
@@ -411,6 +349,64 @@ void put_light(GLint i){
         break;
     }
 }
+
+void inicializar_luces(){
+    //objetos_luz bombilla, sol, foco;
+
+    global_lights[0].position[0] = 0.0f;
+    global_lights[0].position[1] = 1.0f;
+    global_lights[0].position[2] = 0.0f;
+    global_lights[0].position[3] = 0.0f;
+    global_lights[0].ambient[0] = 1.2f;
+    global_lights[0].ambient[1] = 1.2f;
+    global_lights[0].ambient[2] = 1.2f;
+    global_lights[0].ambient[3] = 1.0f;
+    global_lights[0].diffuse[0] = 1.0f;
+    global_lights[0].diffuse[1] = 1.0f;
+    global_lights[0].diffuse[2] = 1.0f;
+    global_lights[0].diffuse[3] = 1.0f;
+    global_lights[0].specular[0] = 1.0f;
+    global_lights[0].specular[1] = 1.0f;
+    global_lights[0].specular[2] = 1.0f;
+    global_lights[0].specular[3] = 1.0f;
+    //global_lights[0].is_on = 0;
+
+    //operaciones
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    put_light(0);
+    glGetFloatv(GL_MODELVIEW_MATRIX, global_lights[0].m_obj);
+    global_lights[0].type = SOL;
+    global_lights[0].is_on = 1;
+
+
+    global_lights[1].position[0] = 1.0f;
+    global_lights[1].position[1] = 1.0f;
+    global_lights[1].position[2] = 0.0f;
+    global_lights[1].position[3] = 0.0f;
+    global_lights[1].ambient[0] = 1.2f;
+    global_lights[1].ambient[1] = 1.2f;
+    global_lights[1].ambient[2] = 1.2f;
+    global_lights[1].ambient[3] = 1.0f;
+    global_lights[1].diffuse[0] = 1.0f;
+    global_lights[1].diffuse[1] = 1.0f;
+    global_lights[1].diffuse[2] = 1.0f;
+    global_lights[1].diffuse[3] = 1.0f;
+    global_lights[1].specular[0] = 1.0f;
+    global_lights[1].specular[1] = 1.0f;
+    global_lights[1].specular[2] = 1.0f;
+    global_lights[1].specular[3] = 1.0f;
+    //global_lights[1].is_on = 0;
+
+    //operaciones
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    put_light(1);
+    glGetFloatv(GL_MODELVIEW_MATRIX, global_lights[1].m_obj);
+    global_lights[1].type = BOMBILLA;
+    global_lights[1].is_on = 0;
+}
+
 
 void set_m_spotlight(){
     int i;
