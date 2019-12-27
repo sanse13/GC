@@ -16,7 +16,7 @@ extern GLdouble _ortho_z_min,_ortho_z_max;
 extern object3d *_first_object;
 extern object3d *_selected_object;
 extern lista_camera *_selected_camera;
-objetos_luz global_lights[8];
+extern objetos_luz global_lights[];
 extern GLint flat_smooth;  
 
 //int index1, index2, index3;
@@ -64,7 +64,10 @@ void normal_vectors(){
     GLint index1, index2, index3;
     GLfloat norma;
     vector3 vector_normal;
-    vector3 vector_normal_init = (vector3){.x = 0, .y = 0, .z = 0};
+    vector3 vector_normal_init;
+    vector_normal_init.x = 0; 
+    vector_normal_init.y = 0; 
+    vector_normal_init.z = 0;
 
     for (i = 0; i < _selected_object->num_vertices; i++)
         _selected_object->vertex_table[i].normal_vector = vector_normal_init;

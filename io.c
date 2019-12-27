@@ -51,7 +51,7 @@ extern transformaciones *repag_values;
 extern transformaciones *plus_values;
 extern transformaciones *minus_values;
 
-extern objetos_luz global_lights[];
+objetos_luz global_lights[8];
 extern GLint flat_smooth;
 
 int camera_object_mode = 0;
@@ -60,7 +60,7 @@ int transformacion_activa = TRASLACION;
 int coordenada = COORD_GLOBAL;
 int modo_luz = LUZ_ACTIVADA;
 int luz_activada = 1;
-int _selected_light = 0;
+GLint _selected_light = 0;
 
 
 material_light *ruby, *obsidian;
@@ -101,6 +101,7 @@ void print_help(){
     printf("<B/b>\t\t Rotaciones a la camara.\n");
     printf("<M/m>\t\t Traslaciones a la camara.\n");
     printf("<P/p>\t\t Cambio de tipo de proyeccion (perspectiva o paralela).\n");
+    printf("<A/a>\t\t Activar modo luz.\n");
     printf("¡¡¡TRASLACION ACTIVADA POR DEFECTO!!!\n");
     printf("\n\n");
 }
@@ -179,6 +180,17 @@ void matriz_identidad(GLfloat *m){
     }
 }
 
+void free_ptr(object3d *object){
+    int i;
+    for (i = 0; i < object->num_faces; i++)
+                free(object->face_table[i].vertex_table);
+                
+
+            free(object->face_table);
+            free(object->vertex_table);
+            free(object);
+}
+
 void modo_analisis(int x, int y){
     GLfloat px, py, pz, distance;
     GLfloat m_minus[16], m_plus[16], m_rot[16];
@@ -220,19 +232,6 @@ void modo_analisis(int x, int y){
     matriz_inversa(_selected_camera);
 }
 
-
-
-void free_ptr(object3d *object){
-    int i;
-    for (i = 0; i < object->num_faces; i++)
-                free(object->face_table[i].vertex_table);
-                
-
-            free(object->face_table);
-            free(object->vertex_table);
-            free(object);
-}
-
 void put_light(GLint i){
     switch (i){
     case 0:
@@ -261,7 +260,7 @@ void put_light(GLint i){
         glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 1.0f);
         glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 0.2f);
         glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.1f);
-        glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, global_lights[2].cut_off);
+        glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, global_lights[i].cut_off);
         break;
 
     case 3:
@@ -383,7 +382,7 @@ void inicializar_luces(){
     global_lights[1].position[0] = 1.0f;
     global_lights[1].position[1] = 1.0f;
     global_lights[1].position[2] = 0.0f;
-    global_lights[1].position[3] = 0.0f;
+    global_lights[1].position[3] = 1.0f;
     global_lights[1].ambient[0] = 1.2f;
     global_lights[1].ambient[1] = 1.2f;
     global_lights[1].ambient[2] = 1.2f;
@@ -731,47 +730,47 @@ void keyboard(unsigned char key, int x, int y) {
 
     case '0':
         //insertar luz
-    break;
+        break;
 
     case '1':
         _selected_light = 0;
         printf("SOL seleccionado.\n");
-    break;
+        break;
 
     case '2':
-        _selected_light = 1;
+        _selected_light = 1;    
         printf("BOMBILLA seleccionada.\n");
-    break;
+        break;
 
     case '3':
         _selected_light = 2;
         printf("FOCO seleccionado.\n");
-    break;
+        break;
 
     case '4':
         _selected_light = 3;
         printf("Seleccionada LUZ 4.\n");
-    break;
+        break;
 
     case '5':
         _selected_light = 4;
         printf("Seleccionada LUZ 5.\n");
-    break;
+        break;
 
     case '6':
         _selected_light = 5;
         printf("Seleccionada LUZ 6.\n");
-    break;
+        break;
 
     case '7':
         _selected_light = 6;
         printf("Seleccionada LUZ 7.\n");
-    break;
+        break;
 
     case '8':
         _selected_light = 7;
         printf("Seleccionada LUZ 8.\n");
-    break;
+        break;
 
     case 'w':
     case 'W':
@@ -838,23 +837,20 @@ case GLUT_KEY_UP:
                 break; 
         }
     } else {
+        //printf("estoy en luz\n");
         switch (transformacion_activa){
         
         case TRASLACION:
             if (global_lights[_selected_light].type == BOMBILLA ||
-                global_lights[_selected_light].type == FOCO){
+                global_lights[_selected_light].type == FOCO)
                     aplicar_transformaciones(up_values);
-                }
+                    //printf("transformada bombilla traslacion arriba\n");
         break;
         
         case ROTACION:
                 if (global_lights[_selected_light].type == SOL || 
-                    global_lights[_selected_light].type == FOCO){
+                    global_lights[_selected_light].type == FOCO)
                         aplicar_transformaciones(up_values);
-                    }
-            break;
-        
-        default:
             break;
         }
     }

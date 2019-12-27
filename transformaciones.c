@@ -142,8 +142,7 @@ void aplicar_transformaciones(transformaciones *values){
 
     transformation_matrix();
 
-    switch (transformacion_activa)
-    {
+    switch (transformacion_activa){
     case TRASLACION:
         glTranslatef(values->translate.x, values->translate.y, values->translate.z);
         break;
@@ -159,7 +158,7 @@ void aplicar_transformaciones(transformaciones *values){
         break; 
     }
 
-    set_transformation_matrix();   
+    set_transformation_matrix();  
 }
 
 GLfloat distancia_camara_objeto(){
