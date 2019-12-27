@@ -407,14 +407,14 @@ void inicializar_luces(){
 }
 
 
-void set_m_spotlight(){
+void m_foco(){
     int i;
     for (i = 0; i < 16; i++){
         global_lights[2].m_obj[i] = _selected_object->list_matrix->m[i];
     }
 }
 
-void init_obj_spotlight(){
+void foco_obj(){
     global_lights[2].position[0] = _selected_object->max.x / 2;
     global_lights[2].position[1] = _selected_object->max.y / 2;
     global_lights[2].position[2] = _selected_object->max.z;
@@ -444,9 +444,108 @@ void init_obj_spotlight(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     put_light(2);
-    set_m_spotlight();
+    m_foco();
     global_lights[2].type = FOCO_OBJETO;
     global_lights[2].is_on = 0;
+}
+
+void anadir_luz(){
+    GLint luz, pos, values;
+    objetos_luz new;
+    printf("Elige el tipo de luz: 1 SOL, 2 BOMBILLA, 3 FOCO.\n");
+    scanf("%d", &luz);
+    printf("A continuacion introduce la posicion de 4-8\n");
+    scanf("%d", &pos);
+
+    while (pos < 4 || pos > 8){
+        printf("Error, elija una posicion entre 4 y 8\n");
+        scanf("%d", &pos);
+    }
+
+
+    printf("Ahora si desea propiedades por defecto pulse 0, si desea insertarlas pulse 1.\n");
+    scanf("%d", &values);
+
+    if (values == 0){
+        new.ambient[0] = 1.2f;
+        new.ambient[1] = 1.2f;
+        new.ambient[2] = 1.2f;
+        new.ambient[3] = 1.0f;
+
+        new.diffuse[0] = 1.0f;
+        new.diffuse[1] = 1.0f;
+        new.diffuse[2] = 1.0f;
+        new.diffuse[3] = 1.0f;
+
+        new.specular[0] = 1.0f;
+        new.specular[1] = 1.0f;
+        new.specular[2] = 1.0f;
+        new.specular[3] = 1.0f;
+    } else {
+        printf("Inserta la luz ambiental de la siguiente manera: r g b a\n");
+        scanf("%f %f %f %f", &new.ambient[0], &new.ambient[1], &new.ambient[2], &new.ambient[3]);
+
+        printf("Inserta la luz difusa de la misma manera que antes.\n");
+        scanf("%f %f %f %f", &new.diffuse[0], &new.diffuse[1], &new.diffuse[2], &new.diffuse[3]);
+
+        printf("Inserta la luz especular de la misma manera que antes.\n");
+        scanf("%f %f %f %f", &new.specular[0], &new.specular[1], &new.specular[2], &new.specular[3]);
+    }
+
+    if (luz != 1){
+        printf("Inserte la posicion de la siguiente manera: x y z\n");
+        scanf("%f %f %f", &new.position[0], &new.position[1], &new.position[2]);
+    }
+
+    switch (luz){
+    case 1:
+        new.type = SOL;
+        new.position[0] = 0.0f;
+        new.position[1] = 1.0f;
+        new.position[2] = 0.0f;
+        new.position[3] = 0.0f;
+        break;
+
+    case 2:
+        new.type = BOMBILLA;
+        new.position[3] = 1.0f;
+        break;
+
+    case 3:
+        new.type = FOCO;
+        new.position[3] = 1.0f;
+        printf("Para el foco necesitamos un punto de direccion y un angulo\n");
+        printf("De nuevo, si desea por defecto pulse 0, si desea introducirlo pulse 1.\n");
+        scanf("%d", &values);
+
+        if (values == 0){
+            new.cut_off == 45.0f;
+            new.spot_direction[0] = 0.0f;
+            new.spot_direction[1] = 0.0f;
+            new.spot_direction[2] = 1.0f;
+        } else {
+            printf("Inserte el punto de la siguiente manera: x y z\n");
+            scanf("%f %f %f", &new.spot_direction[0], &new.spot_direction[1], &new.spot_direction[2]);
+
+            printf("Inserte el angulo\n");
+            scanf("%f", &new.cut_off);
+        }
+        break;
+    
+    default:
+        printf("Numero de tipo de luz incorrecto!\n");
+        break;
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    put_light(pos-1);
+    glGetFloatv(GL_MODELVIEW_MATRIX, new.m_obj);
+    new.is_on = 0;
+    global_lights[pos-1] = new;
+
+    printf("Una vez creada, pulse F%d para activarla.\n", pos);
+
 }
 
 void inicializar_materiales(){
@@ -559,7 +658,7 @@ void keyboard(unsigned char key, int x, int y) {
                 normal_vectors();
                 anadir_material(_selected_object);
                 _selected_object->flat_smooth = FLAT;
-                init_obj_spotlight();
+                foco_obj();
                 printf("%s\n",KG_MSSG_FILEREAD);
                 break;
             }
@@ -574,7 +673,7 @@ void keyboard(unsigned char key, int x, int y) {
         /*The selection is circular, thus if we move out of the list we go back to the first element*/
         if (_selected_object == 0) _selected_object = _first_object;
 
-        if (_selected_object != 0) init_obj_spotlight();
+        if (_selected_object != 0) foco_obj();
 
         if (modo_activo == MODO_CAMARA && coordenada == COORD_GLOBAL)
             centre_camera_to_obj(_selected_object);
@@ -611,7 +710,7 @@ void keyboard(unsigned char key, int x, int y) {
                 /*and update the selection*/
                 _selected_object = auxiliar_object;
             }
-            if (_selected_object != 0) init_obj_spotlight();
+            if (_selected_object != 0) foco_obj();
         }
     break;
 
@@ -730,6 +829,7 @@ void keyboard(unsigned char key, int x, int y) {
 
     case '0':
         //insertar luz
+        anadir_luz();
         break;
 
     case '1':
@@ -938,7 +1038,8 @@ case GLUT_KEY_LEFT:
             break;
 
         case ROTACION:
-            if (global_lights[_selected_light].type == FOCO){
+            if (global_lights[_selected_light].type == SOL || 
+                global_lights[_selected_light].type == FOCO){
                 aplicar_transformaciones(left_values);
             }
             break;
@@ -986,7 +1087,8 @@ case GLUT_KEY_RIGHT:
             break;
 
         case ROTACION:
-            if (global_lights[_selected_light].type == FOCO){
+            if (global_lights[_selected_light].type == SOL ||
+                 global_lights[_selected_light].type == FOCO){
                 aplicar_transformaciones(right_values);
             }
             break;

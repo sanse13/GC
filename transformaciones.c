@@ -121,7 +121,7 @@ void set_transformation_matrix(){
 
         if (camera_object_mode == 1)
             add_camera_mode_obj(_selected_object);
-        set_m_spotlight();
+        m_foco();
         } else if (modo_activo == MODO_CAMARA) {
             if (coordenada == COORD_LOCAL){
                 glGetFloatv(GL_MODELVIEW_MATRIX, _selected_camera->current_camera->m_invert);
