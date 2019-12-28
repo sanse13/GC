@@ -246,9 +246,6 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT1, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT1, GL_SPECULAR, global_lights[i].specular); 
         glLightfv(GL_LIGHT1, GL_POSITION, global_lights[i].position); 
-        glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f); 
-        glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f); 
-        glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.1f);
         break;
 
     case 2:
@@ -257,9 +254,6 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT2, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT2, GL_POSITION, global_lights[i].position); 
         glLightfv(GL_LIGHT2, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
-        glLightf(GL_LIGHT2, GL_CONSTANT_ATTENUATION, 1.0f);
-        glLightf(GL_LIGHT2, GL_LINEAR_ATTENUATION, 0.2f);
-        glLightf(GL_LIGHT2, GL_QUADRATIC_ATTENUATION, 0.1f);
         glLightf(GL_LIGHT2, GL_SPOT_CUTOFF, global_lights[i].cut_off);
         break;
 
@@ -268,11 +262,6 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT3, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT3, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT3, GL_POSITION, global_lights[i].position); 
-        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
-            glLightf(GL_LIGHT3, GL_CONSTANT_ATTENUATION, 1.0f);
-            glLightf(GL_LIGHT3, GL_LINEAR_ATTENUATION, 0.2f);
-            glLightf(GL_LIGHT3, GL_QUADRATIC_ATTENUATION, 0.1f);
-        }
 
         if (global_lights[i].type == FOCO){
             glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
@@ -285,11 +274,7 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT4, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT4, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT4, GL_POSITION, global_lights[i].position); 
-        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
-            glLightf(GL_LIGHT4, GL_CONSTANT_ATTENUATION, 1.0f);
-            glLightf(GL_LIGHT4, GL_LINEAR_ATTENUATION, 0.2f);
-            glLightf(GL_LIGHT4, GL_QUADRATIC_ATTENUATION, 0.1f);
-        }
+
         if (global_lights[i].type == FOCO){
              glLightfv(GL_LIGHT4, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
              glLightf(GL_LIGHT4, GL_SPOT_CUTOFF, global_lights[i].cut_off);
@@ -301,11 +286,7 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT5, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT5, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT5, GL_POSITION, global_lights[i].position); 
-        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
-            glLightf(GL_LIGHT5, GL_CONSTANT_ATTENUATION, 1.0f);
-            glLightf(GL_LIGHT5, GL_LINEAR_ATTENUATION, 0.2f);
-            glLightf(GL_LIGHT5, GL_QUADRATIC_ATTENUATION, 0.1f);
-        }
+
         if (global_lights[i].type == FOCO){
             glLightfv(GL_LIGHT5, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
             glLightf(GL_LIGHT5, GL_SPOT_CUTOFF, global_lights[i].cut_off);
@@ -317,11 +298,7 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT6, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT6, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT6, GL_POSITION, global_lights[i].position); 
-        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
-            glLightf(GL_LIGHT6, GL_CONSTANT_ATTENUATION, 1.0f);
-            glLightf(GL_LIGHT6, GL_LINEAR_ATTENUATION, 0.2f);
-            glLightf(GL_LIGHT6, GL_QUADRATIC_ATTENUATION, 0.1f);
-        }
+ 
         if (global_lights[i].type == FOCO){
             glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
             glLightf(GL_LIGHT6, GL_SPOT_CUTOFF, global_lights[i].cut_off);
@@ -333,11 +310,7 @@ void put_light(GLint i){
         glLightfv(GL_LIGHT7, GL_DIFFUSE, global_lights[i].diffuse); 
         glLightfv(GL_LIGHT7, GL_SPECULAR, global_lights[i].specular);
         glLightfv(GL_LIGHT7, GL_POSITION, global_lights[i].position); 
-        if (global_lights[i].type == BOMBILLA || global_lights[i].type == FOCO){
-            glLightf(GL_LIGHT7, GL_CONSTANT_ATTENUATION, 1.0f);
-            glLightf(GL_LIGHT7, GL_LINEAR_ATTENUATION, 0.2f);
-            glLightf(GL_LIGHT7, GL_QUADRATIC_ATTENUATION, 0.1f);
-        }
+
         if (global_lights[i].type == FOCO){
             glLightfv(GL_LIGHT7, GL_SPOT_DIRECTION, global_lights[i].spot_direction);
             glLightf(GL_LIGHT7, GL_SPOT_CUTOFF, global_lights[i].cut_off);
@@ -719,6 +692,19 @@ void keyboard(unsigned char key, int x, int y) {
             global_scalation(0.5f, 0.5f, 0.5f);
         else if (global_lights[_selected_light].type == FOCO || 
             global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off -= 3;
+        else { //modo activo == modo camara
+            wd = (_selected_camera->current_camera->proj->right - _selected_camera->current_camera->proj->left) / KG_STEP_ZOOM;
+            he = (_selected_camera->current_camera->proj->bottom - _selected_camera->current_camera->proj->top) / KG_STEP_ZOOM;
+
+            midx = (_selected_camera->current_camera->proj->right + _selected_camera->current_camera->proj->left) / 2;
+            midy = (_selected_camera->current_camera->proj->bottom + _selected_camera->current_camera->proj->top) / 2;
+
+            _selected_camera->current_camera->proj->right = (midx + wd) / 2;
+            _selected_camera->current_camera->proj->left = (midx - wd) / 2;
+            _selected_camera->current_camera->proj->bottom = (midy + he) / 2;
+            _selected_camera->current_camera->proj->top = (midy - he) / 2;
+
+        }
     break;
 
     case '+':
@@ -726,6 +712,18 @@ void keyboard(unsigned char key, int x, int y) {
             global_scalation(2.0f, 2.0f, 2.0f);
         else if (global_lights[_selected_light].type == FOCO || 
             global_lights[_selected_light].type == FOCO_OBJETO) global_lights[_selected_light].cut_off += 3;
+        else { //modo activo == modo camara
+            wd = (_selected_camera->current_camera->proj->right - _selected_camera->current_camera->proj->left) * KG_STEP_ZOOM;
+            he = (_selected_camera->current_camera->proj->left - _selected_camera->current_camera->proj->top) * KG_STEP_ZOOM;
+
+            midx = (_selected_camera->current_camera->proj->right + _selected_camera->current_camera->proj->left) / 2;
+            midy = (_selected_camera->current_camera->proj->bottom + _selected_camera->current_camera->proj->top) / 2;
+
+            _selected_camera->current_camera->proj->right = (midx + wd) / 2;
+            _selected_camera->current_camera->proj->left = (midx - wd) / 2;
+            _selected_camera->current_camera->proj->bottom = (midy + he) / 2;
+            _selected_camera->current_camera->proj->top = (midy - he) / 2;
+        }
 
         
     break;

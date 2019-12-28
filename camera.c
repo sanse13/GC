@@ -123,8 +123,7 @@ void add_camera_input(){
 }
 
 
-void matriz_inversa(lista_camera *c)
-{
+void matriz_inversa(lista_camera *c){
     c->current_camera->m[0] = c->current_camera->m_invert[0];
     c->current_camera->m[4] = c->current_camera->m_invert[1];
     c->current_camera->m[8] = c->current_camera->m_invert[2];
