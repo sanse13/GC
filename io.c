@@ -427,6 +427,11 @@ void anadir_luz(){
     objetos_luz new;
     printf("Elige el tipo de luz: 1 SOL, 2 BOMBILLA, 3 FOCO.\n");
     scanf("%d", &luz);
+
+    while (luz < 1 || luz > 3){
+        printf("Error, elija entre 1 y 3");
+        scanf("%d", &luz);
+    }
     printf("A continuacion introduce la posicion de 4-8\n");
     scanf("%d", &pos);
 
