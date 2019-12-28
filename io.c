@@ -93,7 +93,7 @@ void print_help(){
     printf("<L/l>\t\t Activar transformaciones en SR objeto\n");
     printf("<c>\t\t Cambiar de camara.\n");
     printf("<C>\t\t Visualizar lo que ve el objeto seleccionado.\n");
-    printf("<K>\t\t Activar modo camara. Transformaciones modifican solo la camara.\n");
+    printf("<K/k>\t\t Activar modo camara. Transformaciones modifican solo la camara.\n");
     printf("--------------Una vez activada la camara:---------------\n");
     printf("<G/g>\t\t Camara en modo analisis.\n");
     printf("<L/l>\t\t Camara en modo vuelo.\n");
@@ -102,6 +102,11 @@ void print_help(){
     printf("<M/m>\t\t Traslaciones a la camara.\n");
     printf("<P/p>\t\t Cambio de tipo de proyeccion (perspectiva o paralela).\n");
     printf("<A/a>\t\t Activar modo luz.\n");
+    printf("<O/o>\t\t Activar modo objeto.\n");
+    printf("<0>\t\t Anadir luz desde teclado.\n");
+    printf("<1-8>\t\t Seleccionar luces.\n");
+    printf("<F1-F8>\t\t Habilitar/deshabilitar luces.\n");
+    printf("<F12>\t\t Cambiar el tipo de iluminacion al objeto seleccionado.\n");
     printf("¡¡¡TRASLACION ACTIVADA POR DEFECTO!!!\n");
     printf("\n\n");
 }
